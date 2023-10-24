@@ -47,22 +47,22 @@ RUN wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.t
     && cd "/opt/streampark-release" \
     && git clone -b $BRANCH -c core.autocrlf=false https://github.com/apache/incubator-streampark.git \
     && cd incubator-streampark \
-    && ./mvnw clean install \
-       -Pscala-2.11,shaded \
-       -DskipTests \
-       -Dcheckstyle.skip=true \
-       -Dmaven.javadoc.skip=true \
-       -pl 'streampark-common,streampark-flink,streampark-shaded' \
-       -pl '!streampark-console/streampark-console-service' \
-       -amd \
-    && ./mvnw clean install \
-       -Pscala-2.12,shaded \
-       -DskipTests \
-       -Dcheckstyle.skip=true \
-       -Dmaven.javadoc.skip=true \
-       -pl 'streampark-common,streampark-flink,streampark-shaded' \
-       -pl '!streampark-console/streampark-console-service' \
-       -amd \
+#    && ./mvnw clean install \
+#       -Pscala-2.11,shaded \
+#       -DskipTests \
+#       -Dcheckstyle.skip=true \
+#       -Dmaven.javadoc.skip=true \
+#       -pl 'streampark-common,streampark-flink,streampark-shaded' \
+#       -pl '!streampark-console/streampark-console-service' \
+#       -amd \
+#    && ./mvnw clean install \
+#       -Pscala-2.12,shaded \
+#       -DskipTests \
+#       -Dcheckstyle.skip=true \
+#       -Dmaven.javadoc.skip=true \
+#       -pl 'streampark-common,streampark-flink,streampark-shaded' \
+#       -pl '!streampark-console/streampark-console-service' \
+#       -amd \
     && ./mvnw -Pscala-2.11,shaded,webapp,dist -DskipTests clean install \
     && ./mvnw -Pscala-2.12,shaded,webapp,dist -DskipTests clean install \
     && git archive \
