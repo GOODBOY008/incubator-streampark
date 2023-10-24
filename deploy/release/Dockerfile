@@ -1,0 +1,60 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+FROM alpine:3.16
+
+ENV NODE_VERSION=16.1.0
+ENV NPM_VERSION=7.11.2
+
+ENV BRANCH=dev-2.1.2
+ENV STREAMPARK_VERSION=2.1.2
+
+RUN apk add openjdk8 \
+    && apk add maven \
+    && apk add wget \
+    && apk add vim \
+    && apk add bash \
+    && apk add git \
+    && apk add subversion \
+    && apk add gnupg \
+    && apk add curl
+
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
+ENV MAVEN_HOME=/usr/share/java/maven-3
+ENV PATH $JAVA_HOME/bin:$PATH
+ENV PATH $MAVEN_HOME/bin:$PATH
+ENV GPG_TTY=$(tty)
+
+RUN wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
+    && tar zxvf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
+    && rm "node-v$NODE_VERSION-linux-x64.tar.gz" \
+    && ln -s /usr/local/bin/node /usr/local/bin/nodejs \
+    && mkdir "/opt/streampark-release" \
+    && cd "/opt/streampark-release" \
+    && git clone -b $BRANCH -c core.autocrlf=false https://github.com/apache/incubator-streampark.git \
+    && cd incubator-streampark \
+    && mvn -Pscala-2.11,shaded,webapp,dist -DskipTests clean install \
+    && mvn -Pscala-2.12,shaded,webapp,dist -DskipTests clean install \
+    && git archive \
+       --format=tar.gz \
+       --output="dist/apache-streampark-$STREAMPARK_VERSION-incubating-src.tar.gz" \
+       --prefix="apache-streampark-$STREAMPARK_VERSION-incubating-src" \
+       $BRANCH
+
+CMD ["/bin/bash"]
+
+EXPOSE 22
