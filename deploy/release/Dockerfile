@@ -47,9 +47,23 @@ RUN wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.t
     && cd "/opt/streampark-release" \
     && git clone -b $BRANCH -c core.autocrlf=false https://github.com/apache/incubator-streampark.git \
     && cd incubator-streampark \
-    && mvn -B clean install -Pscala-2.11,shaded -DskipTests \
+    && mvn clean install \
+       -Pscala-2.11,shaded \
+       -DskipTests \
+       -Dcheckstyle.skip=true \
+       -Dmaven.javadoc.skip=true \
+       -pl 'streampark-common,streampark-flink,streampark-shaded' \
+       -pl '!streampark-console/streampark-console-service' \
+       -amd \
+    && mvn clean install \
+       -Pscala-2.12,shaded \
+       -DskipTests \
+       -Dcheckstyle.skip=true \
+       -Dmaven.javadoc.skip=true \
+       -pl 'streampark-common,streampark-flink,streampark-shaded' \
+       -pl '!streampark-console/streampark-console-service' \
+       -amd \
     && mvn -Pscala-2.11,shaded,webapp,dist -DskipTests clean install \
-    && mvn -B clean install -Pscala-2.12,shaded -DskipTests \
     && mvn -Pscala-2.12,shaded,webapp,dist -DskipTests clean install \
     && git archive \
        --format=tar.gz \
