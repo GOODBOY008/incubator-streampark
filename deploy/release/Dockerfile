@@ -43,33 +43,21 @@ RUN wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.t
     && tar zxvf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
     && rm "node-v$NODE_VERSION-linux-x64.tar.gz" \
     && ln -s /usr/local/bin/node /usr/local/bin/nodejs \
-    && mkdir "/opt/streampark-release" \
+    && mkdir "/opt/streampark-release/$STREAMPARK_VERSION" \
     && cd "/opt/streampark-release" \
     && git clone -b $BRANCH -c core.autocrlf=false https://github.com/apache/incubator-streampark.git \
     && cd incubator-streampark \
-#    && ./mvnw clean install \
-#       -Pscala-2.11,shaded \
-#       -DskipTests \
-#       -Dcheckstyle.skip=true \
-#       -Dmaven.javadoc.skip=true \
-#       -pl 'streampark-common,streampark-flink,streampark-shaded' \
-#       -pl '!streampark-console/streampark-console-service' \
-#       -amd \
-#    && ./mvnw clean install \
-#       -Pscala-2.12,shaded \
-#       -DskipTests \
-#       -Dcheckstyle.skip=true \
-#       -Dmaven.javadoc.skip=true \
-#       -pl 'streampark-common,streampark-flink,streampark-shaded' \
-#       -pl '!streampark-console/streampark-console-service' \
-#       -amd \
     && ./mvnw -Pscala-2.11,shaded,webapp,dist -DskipTests clean install \
     && ./mvnw -Pscala-2.12,shaded,webapp,dist -DskipTests clean install \
     && git archive \
        --format=tar.gz \
        --output="dist/apache-streampark-$STREAMPARK_VERSION-incubating-src.tar.gz" \
        --prefix="apache-streampark-$STREAMPARK_VERSION-incubating-src" \
-       $BRANCH
+       $BRANCH \
+    && cd /opt/streampark-release  \
+    && mv incubator-streampark/dist "/opt/streampark-release/$STREAMPARK_VERSION" \
+    && rm -rf incubator-streampark
+
 
 CMD ["/bin/bash"]
 
