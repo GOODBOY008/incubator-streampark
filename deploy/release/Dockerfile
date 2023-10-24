@@ -43,7 +43,7 @@ RUN wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.t
     && tar zxvf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
     && rm "node-v$NODE_VERSION-linux-x64.tar.gz" \
     && ln -s /usr/local/bin/node /usr/local/bin/nodejs \
-    && mkdir "/opt/streampark-release/$STREAMPARK_VERSION" \
+    && mkdir -p "/opt/streampark-release/$STREAMPARK_VERSION" \
     && cd "/opt/streampark-release" \
     && git clone -b $BRANCH -c core.autocrlf=false https://github.com/apache/incubator-streampark.git \
     && cd incubator-streampark \
