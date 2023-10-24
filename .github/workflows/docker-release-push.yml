@@ -33,6 +33,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.repository == 'GOODBOY008/incubator-streampark' }}
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
