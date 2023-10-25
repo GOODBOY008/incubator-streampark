@@ -56,7 +56,8 @@ RUN wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.t
        $BRANCH \
     && cd /opt/streampark-release  \
     && mv incubator-streampark/dist "/opt/streampark-release/$STREAMPARK_VERSION" \
-    && rm -rf incubator-streampark
+    && rm -rf incubator-streampark \
+    && rm -rf /root/.m2
 
 
 CMD ["/bin/bash"]
