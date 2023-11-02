@@ -52,7 +52,7 @@ RUN wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.t
     && git archive \
        --format=tar.gz \
        --output="dist/apache-streampark-$STREAMPARK_VERSION-incubating-src.tar.gz" \
-       --prefix="apache-streampark-$STREAMPARK_VERSION-incubating-src" \
+       --prefix="apache-streampark-$STREAMPARK_VERSION-incubating-src/" \
        $BRANCH \
     && cd /opt/streampark-release  \
     && mv incubator-streampark/dist "/opt/streampark-release/$STREAMPARK_VERSION" \
