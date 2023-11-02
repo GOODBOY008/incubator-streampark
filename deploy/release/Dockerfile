@@ -20,7 +20,7 @@ FROM alpine:3.16
 ENV NODE_VERSION=16.1.0
 ENV NPM_VERSION=7.11.2
 
-ENV BRANCH=release-2.1.2-rc1
+ENV BRANCH=release-2.1.2-rc2
 ENV STREAMPARK_VERSION=2.1.2
 
 RUN apk add openjdk8 \
