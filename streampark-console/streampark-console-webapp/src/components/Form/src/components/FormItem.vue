@@ -269,7 +269,7 @@
           propsData.placeholder =
             unref(getComponentsProps)?.placeholder || createPlaceholderMessage(component);
         }
-        propsData.codeField = field;
+        propscodeField = field;
         propsData.formValues = unref(getValues);
 
         const bindValue: Recordable = {

@@ -51,14 +51,14 @@ export function formatRequestDate(params: Recordable) {
 export function requestErrorHandle(error: any) {
   const { Swal, notification } = useMessage();
   if (error.response) {
-    if (error.response.data.code == 501) {
+    if (error.response.code == 501) {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
         text: error.response.data.message,
         footer: '<a href="https://streampark.apache.org/">View the official documentation?</a>',
       });
-    } else if (error.response.data.code == 502) {
+    } else if (error.response.code == 502) {
       let width = document.documentElement.clientWidth || document.body.clientWidth;
       if (width > 1200) {
         width = 1080;

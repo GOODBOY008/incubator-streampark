@@ -60,7 +60,7 @@
   /* Edit button */
   async function handleEditFlink(item: FlinkEnv) {
     const resp = await fetchValidity(item.id);
-    if (resp.data.code == 200) {
+    if (resp.code == 200) {
       versionId.value = item.id;
       openFlinkModal(true, {
         versionId: item.id,
@@ -80,7 +80,7 @@
   /* delete flink home */
   async function handleDelete(item: FlinkEnv) {
     const resp = await fetchFlinkEnvRemove(item.id);
-    if (resp.data.code == 200) {
+    if (resp.code == 200) {
       await getFlinkSetting();
       createMessage.success('The current flink home is removed.');
     }

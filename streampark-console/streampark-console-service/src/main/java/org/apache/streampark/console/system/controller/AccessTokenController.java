@@ -60,20 +60,20 @@ public class AccessTokenController {
     @PostMapping(value = "check")
     public RestResponse verifyToken() {
         Long userId = serviceHelper.getUserId();
-        RestResponse restResponse = RestResponse.success();
+        AccessTokenStateEnum restResponse;
         if (userId != null) {
             AccessToken accessToken = accessTokenService.getByUserId(userId);
             if (accessToken == null) {
-                restResponse.data(AccessTokenStateEnum.NULL.get());
+                restResponse = AccessTokenStateEnum.NULL;
             } else if (AccessToken.STATUS_DISABLE.equals(accessToken.getFinalStatus())) {
-                restResponse.data(AccessTokenStateEnum.INVALID.get());
+                restResponse = AccessTokenStateEnum.INVALID;
             } else {
-                restResponse.data(AccessTokenStateEnum.OK.get());
+                restResponse = AccessTokenStateEnum.OK;
             }
         } else {
-            restResponse.data(AccessTokenStateEnum.INVALID.get());
+            restResponse = AccessTokenStateEnum.INVALID;
         }
-        return restResponse;
+        return RestResponse.success(restResponse);
     }
 
     @PostMapping(value = "list")

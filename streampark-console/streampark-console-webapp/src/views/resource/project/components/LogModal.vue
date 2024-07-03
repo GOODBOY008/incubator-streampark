@@ -62,15 +62,15 @@
         id: project.id,
         startOffset,
       });
-      if (data.readFinished === false) {
+      if (data.data.readFinished === false) {
         showRefresh.value = true;
         start();
       } else {
         showRefresh.value = false;
       }
       logTime.value = formatToDateTime(new Date());
-      if (data.data) {
-        setContent(data.data);
+      if (data.data.fileContent) {
+        setContent(data.data.fileContent);
         handleRevealLine();
       }
     } catch (error) {

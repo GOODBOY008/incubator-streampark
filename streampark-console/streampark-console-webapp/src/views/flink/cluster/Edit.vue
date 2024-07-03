@@ -68,9 +68,8 @@
           id: cluster.id,
         });
         const res = await fetchCheckCluster(params);
-        const status = parseInt(res.status);
-        if (status === 0) {
-          fetchUpdateCluster(params);
+        if (res.data.code == 200) {
+          await fetchUpdateCluster(params);
           Swal.fire({
             icon: 'success',
             title: values.clusterName.concat(
@@ -81,7 +80,7 @@
           });
           go('/flink/cluster');
         } else {
-          Swal.fire('Failed', res.msg, 'error');
+          Swal.fire('Failed', res.data.message, 'error');
         }
       }
     } catch (error) {

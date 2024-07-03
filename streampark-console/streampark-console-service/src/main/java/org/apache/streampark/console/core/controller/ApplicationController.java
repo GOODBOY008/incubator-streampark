@@ -56,7 +56,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URI;
 import java.util.Map;
 
 @Slf4j
@@ -86,7 +85,7 @@ public class ApplicationController {
     @PostMapping("get")
     @PermissionScope(app = "#app.id")
     @RequiresPermissions("app:detail")
-    public RestResponse get(Application app) {
+    public RestResponse<Application> get(Application app) {
         Application application = applicationManageService.getApp(app.getId());
         return RestResponse.success(application);
     }
@@ -113,7 +112,7 @@ public class ApplicationController {
     @RequiresPermissions("app:update")
     public RestResponse update(Application app) {
         applicationManageService.update(app);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("dashboard")
@@ -172,7 +171,7 @@ public class ApplicationController {
     @RequiresPermissions("app:start")
     public RestResponse start(@Parameter(hidden = true) Application app) throws Exception {
         applicationActionService.start(app, false);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @Operation(summary = "Cancel application", tags = {ApiDocConstant.OPENAPI_TAG})
@@ -274,7 +273,7 @@ public class ApplicationController {
     @PostMapping("checkjar")
     public RestResponse checkjar(String jar) throws IOException {
         Utils.requireCheckJarFile(new File(jar).toURI().toURL());
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("upload")
@@ -284,36 +283,14 @@ public class ApplicationController {
         return RestResponse.success(uploadPath);
     }
 
-    @PostMapping("verifySchema")
-    public RestResponse verifySchema(String path) {
-        final URI uri = URI.create(path);
-        final String scheme = uri.getScheme();
-        final String pathPart = uri.getPath();
-        RestResponse restResponse = RestResponse.success(true);
-        String error = null;
-        if (scheme == null) {
-            error =
-                "The scheme (hdfs://, file://, etc) is null. Please specify the file system scheme explicitly in the URI.";
-        } else if (pathPart == null) {
-            error =
-                "The path to store the checkpoint data in is null. Please specify a directory path for the checkpoint data.";
-        } else if (pathPart.isEmpty() || "/".equals(pathPart)) {
-            error = "Cannot use the root directory for checkpoints.";
-        }
-        if (error != null) {
-            restResponse = RestResponse.success(false).message(error);
-        }
-        return restResponse;
-    }
-
     @PostMapping("checkSavepointPath")
     @PermissionScope(app = "#app.id", team = "#app.teamId")
     public RestResponse checkSavepointPath(Application app) throws Exception {
         String error = applicationInfoService.checkSavepointPath(app);
         if (error == null) {
-            return RestResponse.success(true);
+            return RestResponse.success();
         }
-        return RestResponse.success(false).message(error);
+        return RestResponse.error(error);
     }
 
     @PermissionScope(app = "#id")

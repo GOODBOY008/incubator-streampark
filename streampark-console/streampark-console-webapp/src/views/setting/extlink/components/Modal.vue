@@ -137,7 +137,7 @@
           badgeName: formValue.badgeName,
           linkUrl: formValue.linkUrl,
         });
-        if (data.code === ResultEnum.SUCCESS) {
+        if (code === ResultEnum.SUCCESS) {
           Swal.fire({
             icon: 'success',
             title: t('setting.externalLink.operateMessage.updateLinkSuccessful'),
@@ -153,7 +153,7 @@
         }
       } else {
         const { data } = await fetchExternalLinkCreate(formValue);
-        if (data.code === ResultEnum.SUCCESS) {
+        if (code === ResultEnum.SUCCESS) {
           Swal.fire({
             icon: 'success',
             title: t('setting.externalLink.operateMessage.createLinkSuccessful'),

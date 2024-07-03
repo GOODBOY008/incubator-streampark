@@ -35,7 +35,6 @@ export default {
   },
   update: {
     success: '设置更新成功！',
-    dockerNotStart: '依赖你本地的Docker服务，请确保本地Docker已启动. 🙂',
   },
   title: {
     mavenSettings: 'Maven Settings 文件路径',
