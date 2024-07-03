@@ -20,7 +20,6 @@ package org.apache.streampark.console.core.controller;
 import org.apache.streampark.common.enums.ClusterState;
 import org.apache.streampark.console.base.domain.RestResponse;
 import org.apache.streampark.console.base.exception.InternalException;
-import org.apache.streampark.console.core.bean.ResponseResult;
 import org.apache.streampark.console.core.entity.FlinkCluster;
 import org.apache.streampark.console.core.service.FlinkClusterService;
 import org.apache.streampark.console.core.service.ServiceHelper;
@@ -68,8 +67,8 @@ public class FlinkClusterController {
 
     @PostMapping("check")
     public RestResponse check(FlinkCluster cluster) {
-        ResponseResult checkResult = flinkClusterService.check(cluster);
-        return RestResponse.success(checkResult);
+        flinkClusterService.check(cluster);
+        return RestResponse.success();
     }
 
     @PostMapping("create")

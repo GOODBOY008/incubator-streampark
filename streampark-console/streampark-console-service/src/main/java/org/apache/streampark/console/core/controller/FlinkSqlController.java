@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -84,7 +85,7 @@ public class FlinkSqlController {
             }
             return response;
         }
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("list")
@@ -127,6 +128,6 @@ public class FlinkSqlController {
 
     @PostMapping("sqlComplete")
     public RestResponse getSqlComplete(@NotNull(message = "{required}") String sql) {
-        return RestResponse.success().put("word", sqlComplete.getComplete(sql));
+        return RestResponse.success(Collections.singletonMap("word", sqlComplete.getComplete(sql)));
     }
 }

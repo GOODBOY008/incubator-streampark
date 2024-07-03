@@ -65,13 +65,13 @@ public class ProjectController {
     @PermissionScope(team = "#project.teamId")
     public RestResponse update(Project project) {
         boolean update = projectService.update(project);
-        return RestResponse.success().data(update);
+        return RestResponse.success(update);
     }
 
     @PostMapping("get")
     @PermissionScope(team = "#project.teamId")
     public RestResponse get(Project project) {
-        return RestResponse.success().data(projectService.getById(project.getId()));
+        return RestResponse.success(projectService.getById(project.getId()));
     }
 
     @PostMapping("build")
@@ -100,14 +100,14 @@ public class ProjectController {
             return RestResponse.success(Collections.emptyList());
         }
         IPage<Project> page = projectService.getPage(project, restRequest);
-        return RestResponse.success().data(page);
+        return RestResponse.success(page);
     }
 
     @PostMapping("branches")
     @PermissionScope(team = "#project.teamId")
     public RestResponse branches(Project project) {
         List<String> branches = project.getAllBranches();
-        return RestResponse.success().data(branches);
+        return RestResponse.success(branches);
     }
 
     @PostMapping("delete")
@@ -115,48 +115,48 @@ public class ProjectController {
     @PermissionScope(team = "#project.teamId")
     public RestResponse delete(Project project) {
         Boolean deleted = projectService.removeById(project.getId());
-        return RestResponse.success().data(deleted);
+        return RestResponse.success(deleted);
     }
 
     @PostMapping("gitcheck")
     @PermissionScope(team = "#project.teamId")
     public RestResponse gitCheck(Project project) {
         GitAuthorizedErrorEnum error = project.gitCheck();
-        return RestResponse.success().data(error.getType());
+        return RestResponse.success(error.getType());
     }
 
     @PostMapping("exists")
     @PermissionScope(team = "#project.teamId")
     public RestResponse exists(Project project) {
         boolean exists = projectService.exists(project);
-        return RestResponse.success().data(exists);
+        return RestResponse.success(exists);
     }
 
     @PostMapping("modules")
     @PermissionScope(team = "#project.teamId")
     public RestResponse modules(Project project) {
         List<String> result = projectService.listModules(project.getId());
-        return RestResponse.success().data(result);
+        return RestResponse.success(result);
     }
 
     @PostMapping("jars")
     @PermissionScope(team = "#project.teamId")
     public RestResponse jars(Project project) {
         List<String> result = projectService.listJars(project);
-        return RestResponse.success().data(result);
+        return RestResponse.success(result);
     }
 
     @PostMapping("listconf")
     @PermissionScope(team = "#project.teamId")
     public RestResponse listConf(Project project) {
         List<Map<String, Object>> list = projectService.listConf(project);
-        return RestResponse.success().data(list);
+        return RestResponse.success(list);
     }
 
     @PostMapping("select")
     @PermissionScope(team = "#teamId")
     public RestResponse select(@RequestParam Long teamId) {
         List<Project> list = projectService.listByTeamId(teamId);
-        return RestResponse.success().data(list);
+        return RestResponse.success(list);
     }
 }

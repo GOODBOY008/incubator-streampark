@@ -93,33 +93,19 @@
       const formData = await validate();
       if (type.value === 'docker') {
         const resp = await fetchVerifyDocker(formData);
-        switch (resp.status) {
-          case 200:
-            await fetchDockerUpdate(formData);
-            break;
-          case 400:
-            Swal.fire({
-              icon: 'error',
-              title: t('setting.system.update.dockerNotStart'),
-              showConfirmButton: true,
-              timer: 3500,
-            });
-            return;
-          case 500:
-            Swal.fire({
-              icon: 'error',
-              title: resp.msg,
-              showConfirmButton: true,
-              timer: 3500,
-            });
-            return;
-          default:
-            break;
-        }
+        if (resp.data.code == 200) {
+          await fetchDockerUpdate(formData);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: resp.data.message,
+            showConfirmButton: true,
+            timer: 3500,
+          });
       }
       if (type.value === 'email') {
         const resp = await fetchVerifyEmail(formData);
-        if (resp.status === 200) {
+        if (resp.data.code == 200) {
           await fetchEmailUpdate(formData);
         } else {
           Swal.fire({

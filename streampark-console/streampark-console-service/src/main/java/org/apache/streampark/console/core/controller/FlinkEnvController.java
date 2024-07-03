@@ -55,7 +55,7 @@ public class FlinkEnvController {
     @PostMapping("create")
     public RestResponse create(FlinkEnv version) throws Exception {
         flinkEnvService.create(version);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("get")
@@ -74,7 +74,7 @@ public class FlinkEnvController {
     @PostMapping("update")
     public RestResponse update(FlinkEnv version) {
         flinkEnvService.update(version);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("delete")
@@ -86,7 +86,7 @@ public class FlinkEnvController {
     @PostMapping("validity")
     public RestResponse validity(FlinkEnv version) {
         flinkEnvService.validity(version.getId());
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("default")

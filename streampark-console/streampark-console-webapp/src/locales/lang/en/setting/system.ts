@@ -35,7 +35,6 @@ export default {
   },
   update: {
     success: 'Setting updated successfully',
-    dockerNotStart: 'Please make sure your Docker service has been started. 🙂',
   },
   title: {
     mavenSettings: 'Maven Settings File Path',

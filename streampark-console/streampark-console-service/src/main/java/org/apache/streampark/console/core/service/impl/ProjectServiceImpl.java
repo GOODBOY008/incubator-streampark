@@ -104,7 +104,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
         LambdaQueryWrapper<Project> queryWrapper =
                 new LambdaQueryWrapper<Project>().eq(Project::getName, project.getName());
         long count = count(queryWrapper);
-        RestResponse response = RestResponse.success();
 
         ApiAlertException.throwIfTrue(count > 0, "project name already exists, add project failed");
         if (StringUtils.isNotBlank(project.getPassword())) {
@@ -124,9 +123,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
         boolean status = save(project);
 
         if (status) {
-            return response.message("Add project successfully").data(true);
+            return RestResponse.success("Add project successfully", true);
         }
-        return response.message("Add project failed").data(false);
+        return RestResponse.success("Add project failed", false);
     }
 
     @Override
@@ -390,7 +389,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
             String errorMsg =
                     String.format("Build log file(fileName=%s) not found, please build first.", logFile);
             log.warn(errorMsg);
-            return RestResponse.success().data(errorMsg);
+            return RestResponse.success(errorMsg);
         }
         boolean isBuilding = this.getById(id).getBuildState() == 0;
         byte[] fileContent;
@@ -418,7 +417,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
             String error =
                     String.format("Read build log file(fileName=%s) caused an exception: ", logFile);
             log.error(error, e);
-            return RestResponse.fail(ResponseCode.CODE_FAIL, error + e.getMessage());
+            return RestResponse.error(ResponseCode.CODE_FAIL, error + e.getMessage());
         }
     }
 
