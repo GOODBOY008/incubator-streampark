@@ -85,7 +85,7 @@ public class ApplicationController {
     @PostMapping("get")
     @PermissionScope(app = "#app.id")
     @RequiresPermissions("app:detail")
-    public RestResponse<Application> get(Application app) {
+    public RestResponse get(Application app) {
         Application application = applicationManageService.getApp(app.getId());
         return RestResponse.success(application);
     }

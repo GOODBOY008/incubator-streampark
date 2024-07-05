@@ -24,20 +24,20 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RestResponse<T> {
+public class RestResponse {
 
     private Integer code;
 
     private String message;
 
-    private T data;
+    private Object data;
 
     /**
     * return success.
     *
     * @return {@linkplain RestResponse}
     */
-    public static RestResponse<Object> success() {
+    public static RestResponse success() {
         return success("");
     }
 
@@ -47,7 +47,7 @@ public class RestResponse<T> {
     * @param msg msg
     * @return {@linkplain RestResponse}
     */
-    public static RestResponse<Object> success(final String msg) {
+    public static RestResponse success(final String msg) {
         return success(msg, null);
     }
 
@@ -57,7 +57,7 @@ public class RestResponse<T> {
     * @param data this is result data.
     * @return {@linkplain RestResponse}
     */
-    public static <T> RestResponse<T> success(final T data) {
+    public static RestResponse success(final Object data) {
         return success(null, data);
     }
 
@@ -68,8 +68,8 @@ public class RestResponse<T> {
     * @param data this is result data.
     * @return {@linkplain RestResponse}
     */
-    public static <T> RestResponse<T> success(final String msg, final T data) {
-        return new RestResponse<>(ResponseCode.CODE_SUCCESS, msg, data);
+    public static  RestResponse success(final String msg, final Object data) {
+        return new RestResponse(ResponseCode.CODE_SUCCESS, msg, data);
     }
 
     /**
@@ -78,7 +78,7 @@ public class RestResponse<T> {
     * @param msg error msg
     * @return {@linkplain RestResponse}
     */
-    public static RestResponse<Object> error(final String msg) {
+    public static RestResponse error(final String msg) {
         return error(ResponseCode.CODE_FAIL, msg);
     }
 
@@ -89,7 +89,7 @@ public class RestResponse<T> {
     * @param msg error msg
     * @return {@linkplain RestResponse}
     */
-    public static RestResponse<Object> error(final int code, final String msg) {
-        return new RestResponse<>(code, msg, null);
+    public static RestResponse error(final int code, final String msg) {
+        return new RestResponse(code, msg, null);
     }
 }

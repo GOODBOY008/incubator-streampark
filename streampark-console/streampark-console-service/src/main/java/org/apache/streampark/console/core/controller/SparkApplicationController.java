@@ -48,7 +48,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URI;
 import java.util.Map;
 
 @Slf4j
@@ -142,13 +141,9 @@ public class SparkApplicationController {
 
     @PostMapping(value = "start")
     @RequiresPermissions("app:start")
-    public RestResponse start(SparkApplication app) {
-        try {
-            applicationActionService.start(app, false);
-            return RestResponse.success();
-        } catch (Exception e) {
-            return RestResponse.success(false).message(e.getMessage());
-        }
+    public RestResponse start(SparkApplication app) throws Exception {
+        applicationActionService.start(app, false);
+        return RestResponse.success();
     }
 
     @PostMapping(value = "cancel")
@@ -235,14 +230,10 @@ public class SparkApplicationController {
     }
 
     @PostMapping("checkjar")
-    public RestResponse checkjar(String jar) {
+    public RestResponse checkjar(String jar) throws Exception {
         File file = new File(jar);
-        try {
-            Utils.requireCheckJarFile(file.toURI().toURL());
-            return RestResponse.success();
-        } catch (IOException e) {
-            return RestResponse.success(file).message(e.getLocalizedMessage());
-        }
+        Utils.requireCheckJarFile(file.toURI().toURL());
+        return RestResponse.success();
     }
 
     @PostMapping("upload")
@@ -250,27 +241,5 @@ public class SparkApplicationController {
     public RestResponse upload(MultipartFile file) throws Exception {
         String uploadPath = resourceService.upload(file);
         return RestResponse.success(uploadPath);
-    }
-
-    @PostMapping("verifySchema")
-    public RestResponse verifySchema(String path) {
-        final URI uri = URI.create(path);
-        final String scheme = uri.getScheme();
-        final String pathPart = uri.getPath();
-        RestResponse restResponse = RestResponse.success(true);
-        String error = null;
-        if (scheme == null) {
-            error =
-                    "The scheme (hdfs://, file://, etc) is null. Please specify the file system scheme explicitly in the URI.";
-        } else if (pathPart == null) {
-            error =
-                    "The path to store the checkpoint data in is null. Please specify a directory path for the checkpoint data.";
-        } else if (pathPart.isEmpty() || "/".equals(pathPart)) {
-            error = "Cannot use the root directory for checkpoints.";
-        }
-        if (error != null) {
-            restResponse = RestResponse.success(false).message(error);
-        }
-        return restResponse;
     }
 }
