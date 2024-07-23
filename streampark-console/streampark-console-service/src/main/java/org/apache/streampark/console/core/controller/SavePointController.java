@@ -73,6 +73,6 @@ public class SavePointController {
     public RestResponse trigger(
                                 Long appId, @Nullable String savepointPath, @Nullable Boolean nativeFormat) {
         savePointService.trigger(appId, savepointPath, nativeFormat);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 }

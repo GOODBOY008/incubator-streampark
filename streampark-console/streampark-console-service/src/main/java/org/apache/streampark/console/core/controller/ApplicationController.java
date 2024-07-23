@@ -49,7 +49,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URI;
 import java.util.Map;
 
 @Slf4j
@@ -79,7 +78,7 @@ public class ApplicationController {
     @PostMapping("get")
     @Permission(app = "#app.id")
     @RequiresPermissions("app:detail")
-    public RestResponse get(Application app) {
+    public RestResponse<Application> get(Application app) {
         Application application = applicationManageService.getApp(app.getId());
         return RestResponse.success(application);
     }
@@ -106,7 +105,7 @@ public class ApplicationController {
     @RequiresPermissions("app:update")
     public RestResponse update(Application app) {
         applicationManageService.update(app);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("dashboard")
@@ -155,7 +154,7 @@ public class ApplicationController {
     @RequiresPermissions("app:start")
     public RestResponse start(Application app) throws Exception {
         applicationActionService.start(app, false);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @Permission(app = "#app.id", team = "#app.teamId")
@@ -247,7 +246,7 @@ public class ApplicationController {
     @PostMapping("check/jar")
     public RestResponse checkjar(String jar) throws IOException {
         Utils.requireCheckJarFile(new File(jar).toURI().toURL());
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("upload")
@@ -284,9 +283,9 @@ public class ApplicationController {
     public RestResponse checkSavepointPath(Application app) throws Exception {
         String error = applicationInfoService.checkSavepointPath(app);
         if (error == null) {
-            return RestResponse.success(true);
+            return RestResponse.success();
         }
-        return RestResponse.success(false).message(error);
+        return RestResponse.error(error);
     }
 
     @Permission(app = "#id")

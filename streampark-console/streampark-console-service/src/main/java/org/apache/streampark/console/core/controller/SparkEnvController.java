@@ -60,7 +60,7 @@ public class SparkEnvController {
         } catch (Exception e) {
             throw new ApiDetailException(e);
         }
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("get")
@@ -83,7 +83,7 @@ public class SparkEnvController {
         } catch (Exception e) {
             throw new ApiDetailException(e);
         }
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("delete")
@@ -95,7 +95,7 @@ public class SparkEnvController {
     @PostMapping("validity")
     public RestResponse validity(SparkEnv version) {
         sparkEnvService.validity(version.getId());
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("default")

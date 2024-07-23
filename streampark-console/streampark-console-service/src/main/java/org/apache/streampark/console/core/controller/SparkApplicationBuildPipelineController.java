@@ -54,13 +54,9 @@ public class SparkApplicationBuildPipelineController {
     @PostMapping("build")
     @RequiresPermissions("app:create")
     @Permission(app = "#appId")
-    public RestResponse buildApplication(Long appId, boolean forceBuild) {
-        try {
-            boolean actionResult = appBuildPipeService.buildApplication(appId, forceBuild);
-            return RestResponse.success(actionResult);
-        } catch (Exception e) {
-            return RestResponse.success(false).message(e.getMessage());
-        }
+    public RestResponse buildApplication(Long appId, boolean forceBuild) throws Exception {
+        boolean actionResult = appBuildPipeService.buildApplication(appId, forceBuild);
+        return RestResponse.success(actionResult);
     }
 
     /**

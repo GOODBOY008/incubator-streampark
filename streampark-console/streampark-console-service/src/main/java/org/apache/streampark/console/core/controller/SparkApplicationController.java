@@ -101,7 +101,7 @@ public class SparkApplicationController {
     @RequiresPermissions("app:update")
     public RestResponse update(SparkApplication app) {
         applicationManageService.update(app);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("dashboard")
@@ -145,9 +145,9 @@ public class SparkApplicationController {
     public RestResponse start(SparkApplication app) {
         try {
             applicationActionService.start(app, false);
-            return RestResponse.success(true);
+            return RestResponse.success();
         } catch (Exception e) {
-            return RestResponse.success(false).message(e.getMessage());
+            return RestResponse.error(e.getMessage());
         }
     }
 
@@ -163,7 +163,7 @@ public class SparkApplicationController {
     @RequiresPermissions("app:clean")
     public RestResponse clean(SparkApplication app) {
         applicationManageService.clean(app);
-        return RestResponse.success(true);
+        return RestResponse.success();
     }
 
     @PostMapping("forcedStop")
@@ -239,9 +239,9 @@ public class SparkApplicationController {
         File file = new File(jar);
         try {
             Utils.requireCheckJarFile(file.toURI().toURL());
-            return RestResponse.success(true);
+            return RestResponse.success();
         } catch (IOException e) {
-            return RestResponse.success(file).message(e.getLocalizedMessage());
+            return RestResponse.error(e.getLocalizedMessage());
         }
     }
 
@@ -269,7 +269,7 @@ public class SparkApplicationController {
             error = "Cannot use the root directory for checkpoints.";
         }
         if (error != null) {
-            restResponse = RestResponse.success(false).message(error);
+            restResponse = RestResponse.error(error);
         }
         return restResponse;
     }
