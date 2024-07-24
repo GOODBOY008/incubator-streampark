@@ -327,13 +327,11 @@ public class ResourceServiceImpl extends ServiceImpl<ResourceMapper, Resource>
             return buildExceptResponse(
                 new RuntimeException("resource name different with FactoryIdentifier"), 5);
         }
-        return RestResponse.success()
-            .data(ImmutableMap.of(STATE, 0, "connector", JacksonUtils.write(connectorResource)));
+        return RestResponse.success(ImmutableMap.of(STATE, 0, "connector", JacksonUtils.write(connectorResource)));
     }
 
     private static RestResponse buildExceptResponse(Exception e, int code) {
-        return RestResponse.success()
-            .data(ImmutableMap.of(STATE, code, EXCEPTION, ExceptionUtils.stringifyException(e)));
+        return RestResponse.success(ImmutableMap.of(STATE, code, EXCEPTION, ExceptionUtils.stringifyException(e)));
     }
 
     private RestResponse checkFlinkApp(Resource resourceParam) {
