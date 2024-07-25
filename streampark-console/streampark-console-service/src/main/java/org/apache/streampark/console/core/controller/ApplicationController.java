@@ -49,6 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.Map;
 
 @Slf4j
@@ -273,7 +274,7 @@ public class ApplicationController {
             error = "Cannot use the root directory for checkpoints.";
         }
         if (error != null) {
-            restResponse = RestResponse.success(false).message(error);
+            restResponse = RestResponse.error(error);
         }
         return restResponse;
     }
