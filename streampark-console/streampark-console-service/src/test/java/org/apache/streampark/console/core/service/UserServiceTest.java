@@ -60,12 +60,10 @@ class UserServiceTest extends SpringUnitTestBase {
         userService.createUser(user);
         // lock user
         user.setStatus(User.STATUS_LOCK);
-        Map<String, Object> data = (Map<String, Object>) userService.updateUser(user).getData();
-        Assertions.assertNotEquals(true, data.get("needTransferResource"));
+        Assertions.assertNull(userService.updateUser(user).getData());
         // unlock user
         user.setStatus(User.STATUS_VALID);
-        Map<String, Object> data1 = (Map<String, Object>) userService.updateUser(user).getData();
-        Assertions.assertNotEquals(true, data1.get("needTransferResource"));
+        Assertions.assertNull(userService.updateUser(user).getData());
 
         Resource resource = new Resource();
         resource.setResourceName("test");

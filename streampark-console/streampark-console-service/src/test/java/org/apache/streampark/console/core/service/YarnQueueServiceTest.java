@@ -113,16 +113,14 @@ class YarnQueueServiceTest extends SpringUnitTestBase {
 
         // Test for error format with non-empty.
         YarnQueue yarnQueue = mockYarnQueue(1L, "queue@");
-        yarnQueueService.checkYarnQueue(yarnQueue);
         assertThatThrownBy(() -> yarnQueueService.checkYarnQueue(yarnQueue))
-            .isInstanceOf(ApiAlertException.class)
+            .isInstanceOf(IllegalArgumentException.class)
             .hasMessage(ERR_FORMAT_HINTS);
 
         // Test for error format with empty.
         yarnQueue.setQueueLabel("");
-        yarnQueueService.checkYarnQueue(yarnQueue);
         assertThatThrownBy(() -> yarnQueueService.checkYarnQueue(yarnQueue))
-            .isInstanceOf(ApiAlertException.class)
+            .isInstanceOf(IllegalArgumentException.class)
             .hasMessage(QUEUE_EMPTY_HINT);
 
         // Test for existed
@@ -135,21 +133,18 @@ class YarnQueueServiceTest extends SpringUnitTestBase {
 
         // QueueLabel updated
         yarnQueue.setQueueLabel("queue2@label1");
-        yarnQueueService.checkYarnQueue(yarnQueue);
         assertThatNoException().isThrownBy(() -> yarnQueueService.checkYarnQueue(yarnQueue));
 
         // new record but same QueueLabel
         yarnQueue.setId(null);
         yarnQueue.setQueueLabel("queue1@label1");
         assertThatThrownBy(() -> yarnQueueService.checkYarnQueue(yarnQueue))
-            .isInstanceOf(ApiAlertException.class)
+            .isInstanceOf(IllegalArgumentException.class)
             .hasMessage(YarnQueueServiceImpl.QUEUE_EXISTED_IN_TEAM_HINT);
 
         // Test for normal cases.
         yarnQueue.setQueueLabel("q1");
-        assertThatThrownBy(() -> yarnQueueService.checkYarnQueue(yarnQueue))
-            .isInstanceOf(ApiAlertException.class)
-            .hasMessage(YarnQueueServiceImpl.QUEUE_AVAILABLE_HINT);
+        yarnQueueService.checkYarnQueue(yarnQueue);
     }
 
     /**
