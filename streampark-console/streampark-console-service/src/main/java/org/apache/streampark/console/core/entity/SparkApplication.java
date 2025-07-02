@@ -29,9 +29,11 @@ import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
 import org.apache.streampark.console.base.util.JacksonUtils;
 import org.apache.streampark.console.core.bean.AppControl;
 import org.apache.streampark.console.core.bean.Dependency;
+import org.apache.streampark.console.core.enums.ConfigFileTypeEnum;
 import org.apache.streampark.console.core.enums.ReleaseStateEnum;
 import org.apache.streampark.console.core.enums.ResourceFromEnum;
 import org.apache.streampark.console.core.enums.SparkAppStateEnum;
+import org.apache.streampark.console.core.enums.SparkOptionStateEnum;
 import org.apache.streampark.console.core.metrics.spark.SparkApplicationSummary;
 import org.apache.streampark.console.core.util.YarnQueueLabelExpression;
 import org.apache.streampark.flink.packer.maven.DependencyInfo;
@@ -67,10 +69,10 @@ public class SparkApplication extends BaseEntity {
     private Long teamId;
 
     /** 1) spark jar 2) spark SQL 3) pyspark*/
-    private Integer jobType;
+    private SparkJobType jobType;
 
     /** 1) Apache Spark 2) StreamPark Spark */
-    private Integer appType;
+    private ApplicationType appType;
 
     /** spark version */
     private Long versionId;
@@ -78,10 +80,10 @@ public class SparkApplication extends BaseEntity {
     /** spark.app.name */
     private String appName;
 
-    private Integer deployMode;
+    private SparkDeployMode deployMode;
 
     /** 1: build (build from csv) 2: upload (upload local jar job) */
-    private Integer resourceFrom;
+    private ResourceFromEnum resourceFrom;
 
     private Long projectId;
 
@@ -157,11 +159,11 @@ public class SparkApplication extends BaseEntity {
     /** has restart count */
     private Integer restartCount;
 
-    private Integer state;
+    private SparkAppStateEnum state;
 
     private String options;
 
-    private Integer optionState;
+    private SparkOptionStateEnum optionState;
 
     private Date optionTime;
 
@@ -174,7 +176,7 @@ public class SparkApplication extends BaseEntity {
 
     /** task release status */
     @TableField("`release`")
-    private Integer release;
+    private ReleaseStateEnum release;
 
     /** determine if a task needs to be built */
     private Boolean build;
@@ -222,7 +224,7 @@ public class SparkApplication extends BaseEntity {
     private transient Long configId;
     private transient String sparkVersion;
     private transient String confPath;
-    private transient Integer format;
+    private transient ConfigFileTypeEnum format;
     private transient String backUpDescription;
 
     /** spark Web UI Url */
@@ -237,14 +239,14 @@ public class SparkApplication extends BaseEntity {
         this.k8sNamespace = StringUtils.isBlank(k8sNamespace) ? Constants.DEFAULT : k8sNamespace;
     }
 
-    public void setState(Integer state) {
+    public void setState(SparkAppStateEnum state) {
         this.state = state;
         this.tracking = shouldTracking() ? 1 : 0;
     }
 
     public void resolveYarnQueue() {
-        if (!(SparkDeployMode.YARN_CLIENT == this.getDeployModeEnum()
-            || SparkDeployMode.YARN_CLUSTER == this.getDeployModeEnum())) {
+        if (!(SparkDeployMode.YARN_CLIENT == this.getDeployMode()
+            || SparkDeployMode.YARN_CLUSTER == this.getDeployMode())) {
             return;
         }
         if (StringUtils.isBlank(this.yarnQueue)) {
@@ -286,7 +288,7 @@ public class SparkApplication extends BaseEntity {
      * @return 1: need to be tracked | 0: no need to be tracked.
      */
     public Boolean shouldTracking() {
-        switch (getStateEnum()) {
+        switch (getState()) {
             case ADDED:
             case FINISHED:
             case FAILED:
@@ -303,7 +305,7 @@ public class SparkApplication extends BaseEntity {
      * @return true: can start | false: can not start.
      */
     public boolean isCanBeStart() {
-        switch (getStateEnum()) {
+        switch (this.state) {
             case ADDED:
             case FAILED:
             case FINISHED:
@@ -314,26 +316,6 @@ public class SparkApplication extends BaseEntity {
             default:
                 return false;
         }
-    }
-
-    @JsonIgnore
-    public ReleaseStateEnum getReleaseState() {
-        return ReleaseStateEnum.of(release);
-    }
-
-    @JsonIgnore
-    public SparkJobType getJobTypeEnum() {
-        return SparkJobType.valueOf(jobType);
-    }
-
-    @JsonIgnore
-    public SparkAppStateEnum getStateEnum() {
-        return SparkAppStateEnum.of(state);
-    }
-
-    @JsonIgnore
-    public SparkDeployMode getDeployModeEnum() {
-        return SparkDeployMode.of(deployMode);
     }
 
     /** Local compilation and packaging working directory */
@@ -361,7 +343,7 @@ public class SparkApplication extends BaseEntity {
     /** Automatically identify remoteAppHome or localAppHome based on app SparkDeployMode */
     @JsonIgnore
     public String getAppHome() {
-        switch (this.getDeployModeEnum()) {
+        switch (this.getDeployMode()) {
             case REMOTE:
             case LOCAL:
             case KUBERNETES_NATIVE_CLIENT:
@@ -372,18 +354,13 @@ public class SparkApplication extends BaseEntity {
                 return getRemoteAppHome();
             default:
                 throw new UnsupportedOperationException(
-                    "unsupported deployMode ".concat(getDeployModeEnum().getName()));
+                    "unsupported deployMode ".concat(getDeployMode().getName()));
         }
     }
 
     @JsonIgnore
     public String getAppLib() {
         return getAppHome().concat("/lib");
-    }
-
-    @JsonIgnore
-    public ApplicationType getApplicationType() {
-        return ApplicationType.of(appType);
     }
 
     public SparkK8sPodTemplates getK8sPodTemplates() {
@@ -404,24 +381,24 @@ public class SparkApplication extends BaseEntity {
 
     @JsonIgnore
     public boolean isSparkOnYarnJob() {
-        return SparkDeployMode.YARN_CLUSTER.getMode() == (this.getDeployMode())
-            || SparkDeployMode.YARN_CLIENT.getMode() == (this.getDeployMode());
+        return SparkDeployMode.YARN_CLUSTER.equals(this.deployMode)
+            || SparkDeployMode.YARN_CLIENT.equals(this.deployMode);
     }
 
     @JsonIgnore
     public boolean isSparkSqlJob() {
-        return SparkJobType.SPARK_SQL.getMode().equals(this.getJobType());
+        return SparkJobType.SPARK_SQL.equals(this.jobType);
     }
 
     @JsonIgnore
     public boolean isSparkJarJob() {
-        return SparkJobType.SPARK_JAR.getMode().equals(this.getJobType());
+        return SparkJobType.SPARK_JAR.equals(this.jobType);
     }
 
     @JsonIgnore
     public boolean isSparkJarOrPySparkJob() {
-        return SparkJobType.SPARK_JAR.getMode().equals(this.getJobType())
-            || SparkJobType.PYSPARK.getMode().equals(this.getJobType());
+        return SparkJobType.SPARK_JAR.equals(this.jobType)
+            || SparkJobType.PYSPARK.equals(this.jobType);
     }
 
     @JsonIgnore
@@ -437,7 +414,7 @@ public class SparkApplication extends BaseEntity {
     }
 
     public boolean isStreamParkJob() {
-        return this.getAppType() == ApplicationType.STREAMPARK_SPARK.getType();
+        return ApplicationType.STREAMPARK_SPARK.equals(this.getAppType());
     }
 
     @JsonIgnore
@@ -453,12 +430,12 @@ public class SparkApplication extends BaseEntity {
 
     @JsonIgnore
     public boolean isRunning() {
-        return SparkAppStateEnum.RUNNING.getValue() == this.getState();
+        return SparkAppStateEnum.RUNNING == this.getState();
     }
 
     @JsonIgnore
     public boolean isNeedRollback() {
-        return ReleaseStateEnum.NEED_ROLLBACK.get() == this.getRelease();
+        return ReleaseStateEnum.NEED_ROLLBACK.equals(this.release);
     }
 
     @JsonIgnore
@@ -474,9 +451,8 @@ public class SparkApplication extends BaseEntity {
         return getStorageType(getDeployMode());
     }
 
-    public static StorageType getStorageType(Integer deployMode) {
-        SparkDeployMode deployModeEnum = SparkDeployMode.of(deployMode);
-        switch (Objects.requireNonNull(deployModeEnum)) {
+    public static StorageType getStorageType(SparkDeployMode deployMode) {
+        switch (Objects.requireNonNull(deployMode)) {
             case YARN_CLUSTER:
             case YARN_CLIENT:
                 return StorageType.HDFS;
@@ -485,7 +461,7 @@ public class SparkApplication extends BaseEntity {
             case REMOTE:
                 return StorageType.LFS;
             default:
-                throw new UnsupportedOperationException("Unsupported ".concat(deployModeEnum.getName()));
+                throw new UnsupportedOperationException("Unsupported ".concat(deployMode.getName()));
         }
     }
 

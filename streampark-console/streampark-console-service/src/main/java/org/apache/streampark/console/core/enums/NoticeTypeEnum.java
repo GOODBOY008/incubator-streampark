@@ -18,6 +18,7 @@
 package org.apache.streampark.console.core.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
 
@@ -30,6 +31,7 @@ public enum NoticeTypeEnum {
     MESSAGE(2);
 
     @EnumValue
+    @JsonValue
     private final int value;
 
     public int get() {

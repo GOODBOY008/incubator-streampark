@@ -258,9 +258,9 @@ public class SparkApplicationManageServiceImpl
             appParam.getTeamId(), "The teamId can't be null. Create application failed.");
 
         appParam.setUserId(ServiceHelper.getUserId());
-        appParam.setState(SparkAppStateEnum.ADDED.getValue());
-        appParam.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
-        appParam.setOptionState(OptionStateEnum.NONE.getValue());
+        appParam.setState(SparkAppStateEnum.ADDED);
+        appParam.setRelease(ReleaseStateEnum.NEED_RELEASE);
+        appParam.setOptionState(OptionStateEnum.NONE);
         appParam.setCreateTime(new Date());
         appParam.setModifyTime(appParam.getCreateTime());
 
@@ -345,12 +345,12 @@ public class SparkApplicationManageServiceImpl
 
         newApp.setHadoopUser(oldApp.getHadoopUser());
         newApp.setRestartSize(oldApp.getRestartSize());
-        newApp.setState(SparkAppStateEnum.ADDED.getValue());
+        newApp.setState(SparkAppStateEnum.ADDED);
         newApp.setOptions(oldApp.getOptions());
-        newApp.setOptionState(OptionStateEnum.NONE.getValue());
+        newApp.setOptionState(OptionStateEnum.NONE);
         newApp.setUserId(ServiceHelper.getUserId());
         newApp.setDescription(oldApp.getDescription());
-        newApp.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
+        newApp.setRelease(ReleaseStateEnum.NEED_RELEASE);
         newApp.setAlertId(oldApp.getAlertId());
         newApp.setCreateTime(new Date());
         newApp.setModifyTime(newApp.getCreateTime());
@@ -389,14 +389,14 @@ public class SparkApplicationManageServiceImpl
         SparkApplication application = getById(appParam.getId());
 
         /* If the original mode is remote, k8s-session, yarn-session, check cluster status */
-        SparkDeployMode sparkDeployMode = application.getDeployModeEnum();
+        SparkDeployMode sparkDeployMode = application.getDeployMode();
 
         boolean success = validateQueueIfNeeded(application, appParam);
         ApiAlertException.throwIfFalse(
             success,
             String.format(ERROR_APP_QUEUE_HINT, appParam.getYarnQueue(), appParam.getTeamId()));
 
-        application.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
+        application.setRelease(ReleaseStateEnum.NEED_RELEASE);
 
         // 1) jar job jar file changed
         if (application.isFromUploadJob()) {
@@ -453,7 +453,7 @@ public class SparkApplicationManageServiceImpl
         application.setRestartSize(appParam.getRestartSize());
         application.setTags(appParam.getTags());
 
-        switch (appParam.getDeployModeEnum()) {
+        switch (appParam.getDeployMode()) {
             case YARN_CLUSTER:
             case YARN_CLIENT:
                 application.setHadoopUser(appParam.getHadoopUser());
@@ -537,7 +537,7 @@ public class SparkApplicationManageServiceImpl
                     // sql and dependency not changed, but version changed, means that rollback to the version
                     CandidateTypeEnum type = CandidateTypeEnum.HISTORY;
                     sparkSqlService.setCandidate(type, appParam.getId(), appParam.getSqlId());
-                    application.setRelease(ReleaseStateEnum.NEED_ROLLBACK.get());
+                    application.setRelease(ReleaseStateEnum.NEED_ROLLBACK);
                     application.setBuild(true);
                 }
             }
@@ -588,9 +588,9 @@ public class SparkApplicationManageServiceImpl
             LambdaUpdateWrapper<SparkApplication> updateWrapper = Wrappers.lambdaUpdate();
             updateWrapper.eq(SparkApplication::getId, appParam.getId());
             if (appParam.isRunning()) {
-                updateWrapper.set(SparkApplication::getRelease, ReleaseStateEnum.NEED_RESTART.get());
+                updateWrapper.set(SparkApplication::getRelease, ReleaseStateEnum.NEED_RESTART);
             } else {
-                updateWrapper.set(SparkApplication::getRelease, ReleaseStateEnum.DONE.get());
+                updateWrapper.set(SparkApplication::getRelease, ReleaseStateEnum.DONE);
                 updateWrapper.set(SparkApplication::getOptionState, OptionStateEnum.NONE.getValue());
             }
             this.update(updateWrapper);
@@ -607,7 +607,7 @@ public class SparkApplicationManageServiceImpl
 
     @Override
     public void clean(SparkApplication appParam) {
-        appParam.setRelease(ReleaseStateEnum.DONE.get());
+        appParam.setRelease(ReleaseStateEnum.DONE);
         this.updateRelease(appParam);
     }
 
@@ -646,7 +646,7 @@ public class SparkApplicationManageServiceImpl
      */
     @VisibleForTesting
     public boolean validateQueueIfNeeded(SparkApplication appParam) {
-        yarnQueueService.checkQueueLabel(appParam.getDeployModeEnum(), appParam.getYarnQueue());
+        yarnQueueService.checkQueueLabel(appParam.getDeployMode(), appParam.getYarnQueue());
         if (!isYarnNotDefaultQueue(appParam)) {
             return true;
         }
@@ -662,13 +662,13 @@ public class SparkApplicationManageServiceImpl
      */
     @VisibleForTesting
     public boolean validateQueueIfNeeded(SparkApplication oldApp, SparkApplication newApp) {
-        yarnQueueService.checkQueueLabel(newApp.getDeployModeEnum(), newApp.getYarnQueue());
+        yarnQueueService.checkQueueLabel(newApp.getDeployMode(), newApp.getYarnQueue());
         if (!isYarnNotDefaultQueue(newApp)) {
             return true;
         }
 
         oldApp.resolveYarnQueue();
-        if (SparkDeployMode.isYarnMode(newApp.getDeployModeEnum())
+        if (SparkDeployMode.isYarnMode(newApp.getDeployMode())
             && StringUtils.equals(oldApp.getYarnQueue(), newApp.getYarnQueue())) {
             return true;
         }
@@ -684,14 +684,14 @@ public class SparkApplicationManageServiceImpl
      *     (empty or default), return true, false else.
      */
     private boolean isYarnNotDefaultQueue(SparkApplication application) {
-        return SparkDeployMode.isYarnMode(application.getDeployModeEnum())
+        return SparkDeployMode.isYarnMode(application.getDeployMode())
             && !yarnQueueService.isDefaultQueue(application.getYarnQueue());
     }
 
     private boolean isYarnApplicationModeChange(
                                                 SparkApplication application, SparkApplication appParam) {
         return !application.getDeployMode().equals(appParam.getDeployMode())
-            && (SparkDeployMode.YARN_CLIENT == appParam.getDeployModeEnum()
-                || SparkDeployMode.YARN_CLUSTER == application.getDeployModeEnum());
+            && (SparkDeployMode.YARN_CLIENT == appParam.getDeployMode()
+                || SparkDeployMode.YARN_CLUSTER == application.getDeployMode());
     }
 }

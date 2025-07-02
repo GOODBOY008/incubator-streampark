@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /** Used to authenticate access rights */
 public enum AccessTokenStateEnum {
 
@@ -32,6 +35,8 @@ public enum AccessTokenStateEnum {
     /** ok */
     OK(3);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     AccessTokenStateEnum(int value) {

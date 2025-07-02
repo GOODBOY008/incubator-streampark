@@ -135,7 +135,7 @@ public class FlinkClusterWatcher {
             cluster.setAffectedJobs(
                 applicationInfoService.countAffectedByClusterId(
                     cluster.getId(), InternalConfigHolder.get(CommonConfig.SPRING_PROFILES_ACTIVE())));
-            cluster.setClusterState(state.getState());
+            cluster.setClusterState(state);
             cluster.setEndTime(new Date());
             alertService.alert(
                 cluster.getAlertId(), AlertTemplateUtils.createAlertTemplate(cluster, state));
@@ -194,7 +194,7 @@ public class FlinkClusterWatcher {
      * @return
      */
     private ClusterState httpClusterState(FlinkCluster flinkCluster) {
-        switch (flinkCluster.getFlinkDeployModeEnum()) {
+        switch (flinkCluster.getDeployMode()) {
             case REMOTE:
                 return httpRemoteClusterState(flinkCluster);
             case YARN_SESSION:
@@ -263,7 +263,7 @@ public class FlinkClusterWatcher {
      * @param flinkCluster
      */
     public static void addWatching(FlinkCluster flinkCluster) {
-        if (!FlinkDeployMode.isKubernetesMode(flinkCluster.getFlinkDeployModeEnum())
+        if (!FlinkDeployMode.isKubernetesMode(flinkCluster.getDeployMode())
             && !WATCHER_CLUSTERS.containsKey(flinkCluster.getId())) {
             log.info("add the cluster with id:{} to watcher cluster cache", flinkCluster.getId());
             WATCHER_CLUSTERS.put(flinkCluster.getId(), flinkCluster);

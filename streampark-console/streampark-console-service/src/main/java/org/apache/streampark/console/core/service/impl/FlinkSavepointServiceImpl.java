@@ -32,7 +32,6 @@ import org.apache.streampark.console.core.entity.FlinkApplicationConfig;
 import org.apache.streampark.console.core.entity.FlinkCluster;
 import org.apache.streampark.console.core.entity.FlinkEnv;
 import org.apache.streampark.console.core.entity.FlinkSavepoint;
-import org.apache.streampark.console.core.enums.CheckPointTypeEnum;
 import org.apache.streampark.console.core.enums.EngineTypeEnum;
 import org.apache.streampark.console.core.enums.OperationEnum;
 import org.apache.streampark.console.core.enums.OptionStateEnum;
@@ -167,7 +166,7 @@ public class FlinkSavepointServiceImpl extends ServiceImpl<FlinkSavepointMapper,
         ApplicationLog applicationLog = getApplicationLog(application);
         FlinkAppHttpWatcher.addSavepoint(application.getId());
 
-        application.setOptionState(OptionStateEnum.SAVEPOINTING.getValue());
+        application.setOptionState(OptionStateEnum.SAVEPOINTING);
         application.setOptionTime(new Date());
         this.applicationManageService.updateById(application);
         flinkAppHttpWatcher.init();
@@ -187,8 +186,8 @@ public class FlinkSavepointServiceImpl extends ServiceImpl<FlinkSavepointMapper,
     @Nonnull
     private ApplicationLog getApplicationLog(FlinkApplication application) {
         ApplicationLog applicationLog = new ApplicationLog();
-        applicationLog.setJobType(EngineTypeEnum.FLINK.getCode());
-        applicationLog.setOptionName(OperationEnum.SAVEPOINT.getValue());
+        applicationLog.setJobType(EngineTypeEnum.FLINK);
+        applicationLog.setOptionName(OperationEnum.SAVEPOINT);
         applicationLog.setAppId(application.getId());
         applicationLog.setTrackingUrl(application.getJobManagerUrl());
         applicationLog.setCreateTime(new Date());
@@ -260,7 +259,7 @@ public class FlinkSavepointServiceImpl extends ServiceImpl<FlinkSavepointMapper,
             .whenComplete(
                 (t, e) -> {
                     applicationLogService.save(applicationLog);
-                    application.setOptionState(OptionStateEnum.NONE.getValue());
+                    application.setOptionState(OptionStateEnum.NONE);
                     application.setOptionTime(new Date());
                     applicationManageService.update(application);
                     flinkAppHttpWatcher.init();
@@ -286,7 +285,7 @@ public class FlinkSavepointServiceImpl extends ServiceImpl<FlinkSavepointMapper,
     private Map<String, Object> tryGetRestProps(FlinkApplication application, FlinkCluster cluster) {
         Map<String, Object> properties = new HashMap<>();
 
-        if (FlinkDeployMode.isRemoteMode(application.getDeployModeEnum())) {
+        if (FlinkDeployMode.isRemoteMode(application.getDeployMode())) {
             AssertUtils.notNull(
                 cluster,
                 String.format(
@@ -305,7 +304,7 @@ public class FlinkSavepointServiceImpl extends ServiceImpl<FlinkSavepointMapper,
                 ? cluster.getClusterId()
                 : application.getClusterId();
         } else if (FlinkDeployMode.isYarnMode(application.getDeployMode())) {
-            if (FlinkDeployMode.YARN_SESSION.equals(application.getDeployModeEnum())) {
+            if (FlinkDeployMode.YARN_SESSION.equals(application.getDeployMode())) {
                 AssertUtils.notNull(
                     cluster,
                     String.format(
@@ -447,7 +446,7 @@ public class FlinkSavepointServiceImpl extends ServiceImpl<FlinkSavepointMapper,
 
         int cpThreshold = tryGetChkNumRetainedFromDynamicProps(application.getDynamicProperties())
             .orElse(getChkNumRetainedFromFlinkEnv(flinkEnv, application));
-        cpThreshold = CHECKPOINT == CheckPointTypeEnum.of(entity.getType()) ? cpThreshold - 1 : cpThreshold;
+        cpThreshold = CHECKPOINT == entity.getType() ? cpThreshold - 1 : cpThreshold;
 
         if (cpThreshold == 0) {
             this.lambdaUpdate().eq(FlinkSavepoint::getAppId, entity.getAppId())
@@ -490,7 +489,7 @@ public class FlinkSavepointServiceImpl extends ServiceImpl<FlinkSavepointMapper,
         return new TriggerSavepointRequest(
             application.getId(),
             flinkEnv.getFlinkVersion(),
-            application.getDeployModeEnum(),
+            application.getDeployMode(),
             properties,
             clusterId,
             application.getJobId(),

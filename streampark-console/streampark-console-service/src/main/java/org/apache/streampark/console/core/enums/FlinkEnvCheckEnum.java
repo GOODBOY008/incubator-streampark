@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /* the flink environment status */
@@ -39,6 +41,8 @@ public enum FlinkEnvCheckEnum {
     /* defined flink name repeated */
     FLINK_DIST_REPEATED(3);
 
+    @EnumValue
+    @JsonValue
     private final int code;
 
     FlinkEnvCheckEnum(int code) {

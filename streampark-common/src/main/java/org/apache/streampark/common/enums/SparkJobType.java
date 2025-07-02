@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -37,6 +40,8 @@ public enum SparkJobType {
 
     private final String name;
 
+    @EnumValue
+    @JsonValue
     private final Integer mode;
 
     SparkJobType(@Nonnull String name, @Nonnull Integer mode) {

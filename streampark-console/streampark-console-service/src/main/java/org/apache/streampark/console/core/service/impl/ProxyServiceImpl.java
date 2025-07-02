@@ -96,7 +96,7 @@ public class ProxyServiceImpl implements ProxyService {
     public ResponseEntity<?> proxyFlink(HttpServletRequest request, FlinkApplication app) throws Exception {
         ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE);
         String url = null;
-        switch (app.getDeployModeEnum()) {
+        switch (app.getDeployMode()) {
             case YARN_PER_JOB:
             case YARN_APPLICATION:
             case YARN_SESSION:
@@ -114,7 +114,7 @@ public class ProxyServiceImpl implements ProxyService {
                 break;
             default:
                 throw new UnsupportedOperationException(
-                    "unsupported deployMode ".concat(app.getDeployModeEnum().getName()));
+                    "unsupported deployMode ".concat(app.getDeployMode().getName()));
         }
 
         if (url == null) {
@@ -130,7 +130,7 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     public ResponseEntity<?> proxySpark(HttpServletRequest request, SparkApplication app) throws Exception {
         ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE);
-        switch (app.getDeployModeEnum()) {
+        switch (app.getDeployMode()) {
             case YARN_CLIENT:
             case YARN_CLUSTER:
                 String yarnURL = YarnUtils.getRMWebAppProxyURL();
@@ -139,7 +139,7 @@ public class ProxyServiceImpl implements ProxyService {
                 return proxyYarnRequest(request, url);
             default:
                 throw new UnsupportedOperationException(
-                    "unsupported deployMode ".concat(app.getDeployModeEnum().getName()));
+                    "unsupported deployMode ".concat(app.getDeployMode().getName()));
         }
     }
 
@@ -181,7 +181,7 @@ public class ProxyServiceImpl implements ProxyService {
         }
 
         url += getRequestURL(request, "/proxy/flink_cluster/" + clusterId);
-        switch (cluster.getFlinkDeployModeEnum()) {
+        switch (cluster.getDeployMode()) {
             case YARN_PER_JOB:
             case YARN_APPLICATION:
             case YARN_SESSION:
@@ -192,7 +192,7 @@ public class ProxyServiceImpl implements ProxyService {
                 return proxyRequest(request, url);
             default:
                 throw new UnsupportedOperationException(
-                    "unsupported deployMode ".concat(cluster.getFlinkDeployModeEnum().getName()));
+                    "unsupported deployMode ".concat(cluster.getDeployMode().getName()));
         }
     }
 

@@ -199,7 +199,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
         // 1) flink sql setDependency
         FlinkSql newFlinkSql = flinkSqlService.getCandidate(app.getId(), CandidateTypeEnum.NEW);
         FlinkSql effectiveFlinkSql = flinkSqlService.getEffective(app.getId(), false);
-        FlinkJobType jobType = app.getJobTypeEnum();
+        FlinkJobType jobType = app.getJobType();
         if (jobType == FlinkJobType.FLINK_SQL || jobType == FlinkJobType.PYFLINK) {
             FlinkSql flinkSql = newFlinkSql == null ? effectiveFlinkSql : newFlinkSql;
             AssertUtils.notNull(flinkSql);
@@ -223,7 +223,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
                         .setAppId(app.getId());
                     saveEntity(buildPipeline);
 
-                    app.setRelease(ReleaseStateEnum.RELEASING.get());
+                    app.setRelease(ReleaseStateEnum.RELEASING);
                     applicationManageService.updateRelease(app);
 
                     if (flinkAppHttpWatcher.isWatchingApp(app.getId())) {
@@ -264,7 +264,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
                             // upload jar copy to appHome
                             checkOrElseUploadJar(app.getFsOperator(), localJar, uploadJar, appUploads);
 
-                            switch (app.getApplicationType()) {
+                            switch (app.getAppType()) {
                                 case STREAMPARK_FLINK:
                                     fsOperator.mkdirs(app.getAppLib());
                                     fsOperator.copy(uploadJar, app.getAppLib(), false, true);
@@ -276,7 +276,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
                                 default:
                                     throw new IllegalArgumentException(
                                         "[StreamPark] unsupported ApplicationType of FlinkJar: "
-                                            + app.getApplicationType());
+                                            + app.getAppType());
                             }
                         } else {
                             fsOperator.upload(app.getDistHome(), appHome);
@@ -318,10 +318,10 @@ public class FlinkApplicationBuildPipelineServiceImpl
                     if (result.pass()) {
                         // running job ...
                         if (app.isRunning()) {
-                            app.setRelease(ReleaseStateEnum.NEED_RESTART.get());
+                            app.setRelease(ReleaseStateEnum.NEED_RESTART);
                         } else {
-                            app.setOptionState(OptionStateEnum.NONE.getValue());
-                            app.setRelease(ReleaseStateEnum.DONE.get());
+                            app.setOptionState(OptionStateEnum.NONE);
+                            app.setRelease(ReleaseStateEnum.DONE);
                             // If the current task is not running, or the task has just been added, directly
                             // set
                             // the candidate version to the official version
@@ -358,8 +358,8 @@ public class FlinkApplicationBuildPipelineServiceImpl
                             ExceptionUtils.stringifyException(snapshot.error().exception()),
                             NoticeTypeEnum.EXCEPTION);
                         messageService.push(message);
-                        app.setRelease(ReleaseStateEnum.FAILED.get());
-                        app.setOptionState(OptionStateEnum.NONE.getValue());
+                        app.setRelease(ReleaseStateEnum.FAILED);
+                        app.setOptionState(OptionStateEnum.NONE);
                         app.setBuild(true);
                         applicationLog.setException(
                             ExceptionUtils.stringifyException(snapshot.error().exception()));
@@ -414,7 +414,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
     @Nonnull
     private ApplicationLog getApplicationLog(FlinkApplication app) {
         ApplicationLog applicationLog = new ApplicationLog();
-        applicationLog.setOptionName(RELEASE.getValue());
+        applicationLog.setOptionName(RELEASE);
         applicationLog.setAppId(app.getId());
         applicationLog.setCreateTime(new Date());
         applicationLog.setUserId(ServiceHelper.getUserId());
@@ -462,14 +462,14 @@ public class FlinkApplicationBuildPipelineServiceImpl
             }
         }
 
-        FlinkDeployMode deployModeEnum = app.getDeployModeEnum();
+        FlinkDeployMode deployModeEnum = app.getDeployMode();
         String mainClass = Constants.STREAMPARK_FLINKSQL_CLIENT_CLASS;
         switch (deployModeEnum) {
             case YARN_APPLICATION:
                 String yarnProvidedPath = app.getAppLib();
                 String localWorkspace = app.getLocalAppHome().concat("/lib");
-                if (FlinkJobType.FLINK_JAR == app.getJobTypeEnum()
-                    && APACHE_FLINK == app.getApplicationType()) {
+                if (FlinkJobType.FLINK_JAR == app.getJobType()
+                    && APACHE_FLINK == app.getAppType()) {
                     yarnProvidedPath = app.getAppHome();
                     localWorkspace = app.getLocalAppHome();
                 }
@@ -497,7 +497,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
                 return FlinkK8sApplicationBuildPipeline.of(k8sApplicationBuildRequest);
             default:
                 throw new UnsupportedOperationException(
-                    "Unsupported Building Application for DeployMode: " + app.getDeployModeEnum());
+                    "Unsupported Building Application for DeployMode: " + app.getDeployMode());
         }
     }
 
@@ -512,7 +512,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
             mainClass,
             localWorkspace,
             yarnProvidedPath,
-            app.getJobTypeEnum(),
+            app.getJobType(),
             getMergedDependencyInfo(app));
     }
 
@@ -528,8 +528,8 @@ public class FlinkApplicationBuildPipelineServiceImpl
             app.getLocalAppHome(),
             mainClass,
             flinkUserJar,
-            app.getDeployModeEnum(),
-            app.getJobTypeEnum(),
+            app.getDeployMode(),
+            app.getJobType(),
             flinkEnv.getFlinkVersion(),
             getMergedDependencyInfo(app),
             app.getJobName(),
@@ -556,8 +556,8 @@ public class FlinkApplicationBuildPipelineServiceImpl
             app.getLocalAppHome(),
             mainClass,
             flinkUserJar,
-            app.getDeployModeEnum(),
-            app.getJobTypeEnum(),
+            app.getDeployMode(),
+            app.getJobType(),
             flinkEnv.getFlinkVersion(),
             getMergedDependencyInfo(app),
             app.getClusterId(),
@@ -576,8 +576,8 @@ public class FlinkApplicationBuildPipelineServiceImpl
             mainClass,
             flinkUserJar,
             app.isFlinkJar(),
-            app.getDeployModeEnum(),
-            app.getJobTypeEnum(),
+            app.getDeployMode(),
+            app.getJobType(),
             flinkEnv.getFlinkVersion(),
             getMergedDependencyInfo(app));
     }
@@ -586,9 +586,9 @@ public class FlinkApplicationBuildPipelineServiceImpl
      * copy from {@link FlinkApplicationActionService#start(FlinkApplication, boolean)}
      */
     private String retrieveFlinkUserJar(FlinkEnv flinkEnv, FlinkApplication app) {
-        switch (app.getJobTypeEnum()) {
+        switch (app.getJobType()) {
             case FLINK_JAR:
-                switch (app.getApplicationType()) {
+                switch (app.getAppType()) {
                     case STREAMPARK_FLINK:
                         return String.format(
                             "%s/%s", app.getAppLib(), app.getModule().concat(Constants.JAR_SUFFIX));
@@ -597,20 +597,20 @@ public class FlinkApplicationBuildPipelineServiceImpl
                     default:
                         throw new IllegalArgumentException(
                             "[StreamPark] unsupported ApplicationType of FlinkJar: "
-                                + app.getApplicationType());
+                                + app.getAppType());
                 }
             case PYFLINK:
                 return String.format("%s/%s", app.getAppHome(), app.getJar());
             case FLINK_SQL:
                 String sqlDistJar = ServiceHelper.getFlinkSqlClientJar(flinkEnv);
-                if (app.getDeployModeEnum() == FlinkDeployMode.YARN_APPLICATION) {
+                if (app.getDeployMode() == FlinkDeployMode.YARN_APPLICATION) {
                     String clientPath = Workspace.remote().APP_CLIENT();
                     return String.format("%s/%s", clientPath, sqlDistJar);
                 }
                 return Workspace.local().APP_CLIENT().concat("/").concat(sqlDistJar);
             default:
                 throw new UnsupportedOperationException(
-                    "[StreamPark] unsupported JobType: " + app.getJobTypeEnum());
+                    "[StreamPark] unsupported JobType: " + app.getJobType());
         }
     }
 
@@ -630,7 +630,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
     @Override
     public boolean allowToBuildNow(@Nonnull Long appId) {
         return getCurrentBuildPipeline(appId)
-            .map(pipeline -> PipelineStatusEnum.running != pipeline.getPipelineStatus())
+            .map(pipeline -> PipelineStatusEnum.running != pipeline.getPipeStatus())
             .orElse(true);
     }
 
@@ -645,7 +645,7 @@ public class FlinkApplicationBuildPipelineServiceImpl
             return new HashMap<>();
         }
         return appBuildPipelines.stream()
-            .collect(Collectors.toMap(ApplicationBuildPipeline::getAppId, ApplicationBuildPipeline::getPipelineStatus));
+            .collect(Collectors.toMap(ApplicationBuildPipeline::getAppId, ApplicationBuildPipeline::getPipeStatus));
     }
 
     @Override

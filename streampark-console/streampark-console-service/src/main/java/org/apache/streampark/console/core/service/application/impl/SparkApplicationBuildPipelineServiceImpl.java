@@ -19,7 +19,6 @@ package org.apache.streampark.console.core.service.application.impl;
 
 import org.apache.streampark.common.conf.Workspace;
 import org.apache.streampark.common.constants.Constants;
-import org.apache.streampark.common.enums.ApplicationType;
 import org.apache.streampark.common.enums.SparkDeployMode;
 import org.apache.streampark.common.fs.FsOperator;
 import org.apache.streampark.common.util.AssertUtils;
@@ -95,6 +94,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
+import static org.apache.streampark.common.enums.ApplicationType.APACHE_SPARK;
+import static org.apache.streampark.common.enums.ApplicationType.STREAMPARK_SPARK;
 import static org.apache.streampark.console.core.enums.OperationEnum.RELEASE;
 
 @Service
@@ -154,8 +155,8 @@ public class SparkApplicationBuildPipelineServiceImpl
 
         SparkApplication app = applicationManageService.getById(appId);
         ApplicationLog applicationLog = new ApplicationLog();
-        applicationLog.setJobType(EngineTypeEnum.SPARK.getCode());
-        applicationLog.setOptionName(RELEASE.getValue());
+        applicationLog.setJobType(EngineTypeEnum.SPARK);
+        applicationLog.setOptionName(RELEASE);
         applicationLog.setAppId(app.getId());
         applicationLog.setCreateTime(new Date());
         applicationLog.setUserId(ServiceHelper.getUserId());
@@ -196,7 +197,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                         .setAppId(app.getId());
                     saveEntity(buildPipeline);
 
-                    app.setRelease(ReleaseStateEnum.RELEASING.get());
+                    app.setRelease(ReleaseStateEnum.RELEASING);
                     applicationManageService.updateRelease(app);
 
                     if (sparkAppHttpWatcher.isWatchingApp(app.getId())) {
@@ -233,7 +234,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                             // upload jar copy to appHome
                             checkOrElseUploadJar(app.getFsOperator(), localJar, uploadJar, appUploads);
 
-                            switch (app.getApplicationType()) {
+                            switch (app.getAppType()) {
                                 case STREAMPARK_SPARK:
                                     fsOperator.mkdirs(app.getAppLib());
                                     fsOperator.copy(uploadJar, app.getAppLib(), false, true);
@@ -245,7 +246,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                                 default:
                                     throw new IllegalArgumentException(
                                         "[StreamPark] unsupported ApplicationType of FlinkJar: "
-                                            + app.getApplicationType());
+                                            + app.getAppType());
                             }
                         } else {
                             fsOperator.upload(app.getDistHome(), appHome);
@@ -287,10 +288,10 @@ public class SparkApplicationBuildPipelineServiceImpl
                     if (result.pass()) {
                         // running job ...
                         if (app.isRunning()) {
-                            app.setRelease(ReleaseStateEnum.NEED_RESTART.get());
+                            app.setRelease(ReleaseStateEnum.NEED_RESTART);
                         } else {
-                            app.setOptionState(OptionStateEnum.NONE.getValue());
-                            app.setRelease(ReleaseStateEnum.DONE.get());
+                            app.setOptionState(OptionStateEnum.NONE);
+                            app.setRelease(ReleaseStateEnum.DONE);
                             // If the current task is not running, or the task has just been added, directly
                             // set
                             // the candidate version to the official version
@@ -319,8 +320,8 @@ public class SparkApplicationBuildPipelineServiceImpl
                             ExceptionUtils.stringifyException(snapshot.error().exception()),
                             NoticeTypeEnum.EXCEPTION);
                         messageService.push(message);
-                        app.setRelease(ReleaseStateEnum.FAILED.get());
-                        app.setOptionState(OptionStateEnum.NONE.getValue());
+                        app.setRelease(ReleaseStateEnum.FAILED);
+                        app.setOptionState(OptionStateEnum.NONE);
                         app.setBuild(true);
                         applicationLog.setException(
                             ExceptionUtils.stringifyException(snapshot.error().exception()));
@@ -380,14 +381,14 @@ public class SparkApplicationBuildPipelineServiceImpl
             }
         }
 
-        SparkDeployMode deployModeEnum = app.getDeployModeEnum();
+        SparkDeployMode deployModeEnum = app.getDeployMode();
         String mainClass = Constants.STREAMPARK_SPARKSQL_CLIENT_CLASS;
         switch (deployModeEnum) {
             case YARN_CLIENT:
             case YARN_CLUSTER:
                 String yarnProvidedPath = app.getAppLib();
                 String localWorkspace = app.getLocalAppHome().concat("/lib");
-                if (ApplicationType.APACHE_SPARK == app.getApplicationType()) {
+                if (APACHE_SPARK == app.getAppType()) {
                     yarnProvidedPath = app.getAppHome();
                     localWorkspace = app.getLocalAppHome();
                 }
@@ -396,7 +397,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                     mainClass,
                     localWorkspace,
                     yarnProvidedPath,
-                    app.getJobTypeEnum(),
+                    app.getJobType(),
                     deployModeEnum,
                     getMergedDependencyInfo(app));
                 log.info("Submit params to building pipeline : {}", yarnAppRequest);
@@ -410,7 +411,7 @@ public class SparkApplicationBuildPipelineServiceImpl
                 return SparkK8sApplicationBuildPipeline.of(k8sApplicationBuildRequest);
             default:
                 throw new UnsupportedOperationException(
-                    "Unsupported Building Application for DeployMode: " + app.getDeployModeEnum());
+                    "Unsupported Building Application for DeployMode: " + app.getDeployMode());
         }
     }
 
@@ -426,8 +427,8 @@ public class SparkApplicationBuildPipelineServiceImpl
             app.getAppHome(),
             mainClass,
             mainJar,
-            app.getDeployModeEnum(),
-            app.getJobTypeEnum(),
+            app.getDeployMode(),
+            app.getJobType(),
             sparkEnv.getSparkVersion(),
             getMergedDependencyInfo(app),
             app.getK8sNamespace(),
@@ -443,9 +444,9 @@ public class SparkApplicationBuildPipelineServiceImpl
     }
 
     private String retrieveSparkUserJar(SparkEnv sparkEnv, SparkApplication app) {
-        switch (app.getJobTypeEnum()) {
+        switch (app.getJobType()) {
             case SPARK_JAR:
-                switch (app.getApplicationType()) {
+                switch (app.getAppType()) {
                     case STREAMPARK_SPARK:
                         return String.format(
                             "%s/%s", app.getAppLib(), app.getModule().concat(Constants.JAR_SUFFIX));
@@ -454,20 +455,20 @@ public class SparkApplicationBuildPipelineServiceImpl
                     default:
                         throw new IllegalArgumentException(
                             "[StreamPark] unsupported ApplicationType of FlinkJar: "
-                                + app.getApplicationType());
+                                + app.getAppType());
                 }
             case PYSPARK:
                 return String.format("%s/%s", app.getAppHome(), app.getJar());
             case SPARK_SQL:
                 String sqlDistJar = ServiceHelper.getSparkSqlClientJar(sparkEnv);
-                if (app.getDeployModeEnum() == SparkDeployMode.YARN_CLUSTER) {
+                if (app.getDeployMode() == SparkDeployMode.YARN_CLUSTER) {
                     String clientPath = Workspace.remote().APP_CLIENT();
                     return String.format("%s/%s", clientPath, sqlDistJar);
                 }
                 return Workspace.local().APP_CLIENT().concat("/").concat(sqlDistJar);
             default:
                 throw new UnsupportedOperationException(
-                    "[StreamPark] unsupported JobType: " + app.getJobTypeEnum());
+                    "[StreamPark] unsupported JobType: " + app.getJobType());
         }
     }
 
@@ -479,7 +480,7 @@ public class SparkApplicationBuildPipelineServiceImpl
     @Override
     public boolean allowToBuildNow(@Nonnull Long appId) {
         return getCurrentBuildPipeline(appId)
-            .map(pipeline -> PipelineStatusEnum.running != pipeline.getPipelineStatus())
+            .map(pipeline -> PipelineStatusEnum.running != pipeline.getPipeStatus())
             .orElse(true);
     }
 
@@ -494,7 +495,7 @@ public class SparkApplicationBuildPipelineServiceImpl
             return new HashMap<>();
         }
         return appBuildPipelines.stream()
-            .collect(Collectors.toMap(ApplicationBuildPipeline::getAppId, ApplicationBuildPipeline::getPipelineStatus));
+            .collect(Collectors.toMap(ApplicationBuildPipeline::getAppId, ApplicationBuildPipeline::getPipeStatus));
     }
 
     @Override

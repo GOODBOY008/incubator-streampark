@@ -80,8 +80,8 @@ public class QuickStartRunner implements ApplicationRunner {
             FlinkCluster flinkCluster = new FlinkCluster();
             flinkCluster.setClusterName("quickstart");
             flinkCluster.setVersionId(flinkEnv.getId());
-            flinkCluster.setClusterState(ClusterState.RUNNING.getState());
-            flinkCluster.setDeployMode(FlinkDeployMode.REMOTE.getMode());
+            flinkCluster.setClusterState(ClusterState.RUNNING);
+            flinkCluster.setDeployMode(FlinkDeployMode.REMOTE);
             flinkCluster.setAddress("http://localhost:" + quickstart.get("flink_port"));
             flinkClusterService.create(flinkCluster, defaultId);
 
@@ -91,7 +91,7 @@ public class QuickStartRunner implements ApplicationRunner {
             FlinkApplication application = applicationManageService.getApp(app.getId());
             application.setFlinkClusterId(flinkCluster.getId());
             application.setVersionId(flinkEnv.getId());
-            application.setDeployMode(FlinkDeployMode.REMOTE.getMode());
+            application.setDeployMode(FlinkDeployMode.REMOTE);
 
             FlinkSql flinkSql = flinkSqlService.getEffective(application.getId(), true);
             application.setFlinkSql(flinkSql.getSql());

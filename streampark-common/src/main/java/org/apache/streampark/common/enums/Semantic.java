@@ -17,6 +17,8 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -26,13 +28,24 @@ public enum Semantic {
     /**
      * Ensure that the counting results obtained after a fault are consistent with the correct values.
      */
-    EXACTLY_ONCE,
+    EXACTLY_ONCE(0),
 
     /** The program may calculate more after a malfunction, but it will never calculate less. */
-    AT_LEAST_ONCE,
+    AT_LEAST_ONCE(1),
 
     /** After the fault occurs, the counting results may be lost. */
-    NONE;
+    NONE(2);
+
+    @EnumValue
+    private final int value;
+
+    Semantic(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
 
     /** Try to resolve the given semantic name into a known {@link Semantic}. */
     @Nullable

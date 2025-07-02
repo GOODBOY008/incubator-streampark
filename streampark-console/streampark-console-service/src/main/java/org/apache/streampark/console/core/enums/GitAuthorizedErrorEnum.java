@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /** Git authentication results */
 public enum GitAuthorizedErrorEnum {
 
@@ -32,6 +35,8 @@ public enum GitAuthorizedErrorEnum {
     /** Unknown error. */
     UNKNOW(3);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     GitAuthorizedErrorEnum(int value) {

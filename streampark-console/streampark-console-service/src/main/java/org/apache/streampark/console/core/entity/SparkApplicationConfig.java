@@ -46,7 +46,7 @@ public class SparkApplicationConfig {
      * 2)prop <br>
      * 3)hocon
      */
-    private Integer format;
+    private ConfigFileTypeEnum format;
 
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String content;

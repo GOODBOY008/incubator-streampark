@@ -141,7 +141,7 @@ public class FlinkApplicationInfoServiceImpl extends ServiceImpl<FlinkApplicatio
             if (app.getAvailableSlot() != null) {
                 availableSlot += app.getAvailableSlot();
             }
-            if (app.getState() == FlinkAppStateEnum.RUNNING.getValue()) {
+            if (app.getState() == FlinkAppStateEnum.RUNNING) {
                 runningJob++;
             }
             JobsOverview.Task task = app.getOverview();
@@ -221,8 +221,8 @@ public class FlinkApplicationInfoServiceImpl extends ServiceImpl<FlinkApplicatio
             envInitializer.checkFlinkEnv(application.getStorageType(), flinkEnv);
             envInitializer.storageInitialize(application.getStorageType());
 
-            if (FlinkDeployMode.YARN_SESSION == application.getDeployModeEnum()
-                || FlinkDeployMode.REMOTE == application.getDeployModeEnum()) {
+            if (FlinkDeployMode.YARN_SESSION == application.getDeployMode()
+                || FlinkDeployMode.REMOTE == application.getDeployMode()) {
                 FlinkCluster flinkCluster = flinkClusterService.getById(application.getFlinkClusterId());
                 boolean conned = flinkClusterWatcher.verifyClusterConnection(flinkCluster);
                 if (!conned) {
@@ -239,8 +239,8 @@ public class FlinkApplicationInfoServiceImpl extends ServiceImpl<FlinkApplicatio
     @Override
     public boolean checkAlter(FlinkApplication appParam) {
         Long appId = appParam.getId();
-        if (FlinkAppStateEnum.CANCELED != appParam.getStateEnum()
-            && FlinkAppStateEnum.FINISHED != appParam.getStateEnum()) {
+        if (FlinkAppStateEnum.CANCELED != appParam.getState()
+            && FlinkAppStateEnum.FINISHED != appParam.getState()) {
             return false;
         }
         long cancelUserId = FlinkAppHttpWatcher.getCanceledJobUserId(appId);
@@ -269,7 +269,7 @@ public class FlinkApplicationInfoServiceImpl extends ServiceImpl<FlinkApplicatio
             .anyMatch(
                 application -> clusterId.equals(application.getFlinkClusterId())
                     && FlinkAppStateEnum.RUNNING == application
-                        .getStateEnum());
+                        .getState());
     }
 
     @Override
@@ -366,7 +366,7 @@ public class FlinkApplicationInfoServiceImpl extends ServiceImpl<FlinkApplicatio
         ApiAlertException.throwIfNull(
             application, String.format("The application id=%s can't be found.", id));
         ApiAlertException.throwIfFalse(
-            FlinkDeployMode.isKubernetesMode(application.getDeployModeEnum()),
+            FlinkDeployMode.isKubernetesMode(application.getDeployMode()),
             "Job deployMode must be kubernetes-session|kubernetes-application.");
 
         CompletableFuture<String> future = CompletableFuture.supplyAsync(

@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -34,6 +37,8 @@ public enum FlinkK8sRestExposedType {
 
     private final String name;
 
+    @EnumValue
+    @JsonValue
     private final Integer type;
 
     FlinkK8sRestExposedType(@Nonnull String name, @Nonnull Integer type) {

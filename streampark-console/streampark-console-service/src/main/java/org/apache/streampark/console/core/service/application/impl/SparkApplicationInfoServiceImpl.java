@@ -98,7 +98,7 @@ public class SparkApplicationInfoServiceImpl
             if (!teamId.equals(app.getTeamId())) {
                 continue;
             }
-            if (app.getState() == SparkAppStateEnum.RUNNING.getValue()) {
+            if (app.getState() == SparkAppStateEnum.RUNNING) {
                 runningApplication++;
             }
             if (app.getNumTasks() != null) {
@@ -173,7 +173,7 @@ public class SparkApplicationInfoServiceImpl
     @Override
     public boolean checkAlter(SparkApplication appParam) {
         Long appId = appParam.getId();
-        if (SparkAppStateEnum.KILLED != appParam.getStateEnum()) {
+        if (SparkAppStateEnum.KILLED != appParam.getState()) {
             return false;
         }
         long cancelUserId = SparkAppHttpWatcher.getCanceledJobUserId(appId);

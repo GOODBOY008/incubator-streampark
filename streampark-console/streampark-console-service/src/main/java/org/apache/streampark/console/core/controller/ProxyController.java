@@ -118,11 +118,11 @@ public class ProxyController {
 
     private void checkProxyAppLog(ApplicationLog log) {
         ApiAlertException.throwIfNull(log, "Invalid operation, The application log not found.");
-        if (log.getJobType() == EngineTypeEnum.FLINK.getCode()) {
+        if (log.getJobType() == EngineTypeEnum.FLINK) {
             FlinkApplication app = flinkApplicationManageService.getById(log.getAppId());
             checkProxyApp(app.getTeamId());
         }
-        if (log.getJobType() == EngineTypeEnum.SPARK.getCode()) {
+        if (log.getJobType() == EngineTypeEnum.SPARK) {
             SparkApplication app = sparkApplicationManageService.getById(log.getAppId());
             checkProxyApp(app.getTeamId());
         }

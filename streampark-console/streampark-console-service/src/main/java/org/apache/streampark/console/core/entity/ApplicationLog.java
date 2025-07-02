@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.entity;
 
+import org.apache.streampark.console.core.enums.EngineTypeEnum;
+import org.apache.streampark.console.core.enums.OperationEnum;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -42,7 +45,7 @@ public class ApplicationLog {
      * 1: flink
      * 2: spark
      */
-    private Integer jobType;
+    private EngineTypeEnum jobType;
 
     /** clusterId */
     private String clusterId;
@@ -54,7 +57,7 @@ public class ApplicationLog {
     private Boolean success;
 
     /** option name */
-    private Integer optionName;
+    private OperationEnum optionName;
 
     /** option time */
     private Date createTime;

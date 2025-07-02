@@ -63,7 +63,7 @@ public class SparkEffectiveServiceImpl extends ServiceImpl<SparkEffectiveMapper,
         if (count == 0) {
             SparkEffective effective = new SparkEffective();
             effective.setAppId(appId);
-            effective.setTargetType(type.getType());
+            effective.setTargetType(type);
             effective.setTargetId(id);
             effective.setCreateTime(new Date());
             save(effective);

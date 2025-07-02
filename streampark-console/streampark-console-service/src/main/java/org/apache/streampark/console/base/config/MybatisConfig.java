@@ -81,7 +81,6 @@ public class MybatisConfig {
     public MybatisPlusPropertiesCustomizer mybatisPlusPropertiesCustomizer() {
         return properties -> {
             properties.setTypeAliasesPackage("org.apache.streampark.console.*.entity");
-            properties.setTypeEnumsPackage("org.apache.streampark.console.*.enums");
             properties.setMapperLocations(new String[]{"classpath:mapper/*/*.xml"});
             MybatisConfiguration mybatisConfiguration = new MybatisConfiguration();
             mybatisConfiguration.setJdbcTypeForNull(JdbcType.NULL);

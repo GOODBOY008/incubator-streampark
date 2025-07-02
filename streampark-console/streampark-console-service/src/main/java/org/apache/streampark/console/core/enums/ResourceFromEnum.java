@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -30,6 +32,8 @@ public enum ResourceFromEnum {
     /** upload local jar */
     UPLOAD(2);
 
+    @EnumValue
+    @JsonValue
     private final Integer value;
 
     ResourceFromEnum(Integer value) {

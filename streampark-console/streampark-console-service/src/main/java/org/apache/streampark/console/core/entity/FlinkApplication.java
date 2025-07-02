@@ -24,13 +24,17 @@ import org.apache.streampark.common.enums.ApplicationType;
 import org.apache.streampark.common.enums.FlinkDeployMode;
 import org.apache.streampark.common.enums.FlinkJobType;
 import org.apache.streampark.common.enums.FlinkK8sRestExposedType;
+import org.apache.streampark.common.enums.FlinkRestoreMode;
+import org.apache.streampark.common.enums.ResolveOrder;
 import org.apache.streampark.common.enums.StorageType;
 import org.apache.streampark.common.fs.FsOperator;
 import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
 import org.apache.streampark.console.base.util.JacksonUtils;
 import org.apache.streampark.console.core.bean.AppControl;
 import org.apache.streampark.console.core.bean.Dependency;
+import org.apache.streampark.console.core.enums.ConfigFileTypeEnum;
 import org.apache.streampark.console.core.enums.FlinkAppStateEnum;
+import org.apache.streampark.console.core.enums.OptionStateEnum;
 import org.apache.streampark.console.core.enums.ReleaseStateEnum;
 import org.apache.streampark.console.core.enums.ResourceFromEnum;
 import org.apache.streampark.console.core.metrics.flink.JobsOverview;
@@ -73,7 +77,7 @@ public class FlinkApplication extends BaseEntity {
     /**
      * 1) flink jar 2) flink SQL
      */
-    private Integer jobType;
+    private FlinkJobType jobType;
 
     private Long projectId;
     /**
@@ -118,7 +122,7 @@ public class FlinkApplication extends BaseEntity {
     /**
      * The exposed type of the rest service of K8s(kubernetes.rest-service.exposed.type)
      */
-    private Integer k8sRestExposedType;
+    private FlinkK8sRestExposedType k8sRestExposedType;
     /**
      * flink kubernetes pod template
      */
@@ -138,12 +142,12 @@ public class FlinkApplication extends BaseEntity {
      */
     private Boolean k8sHadoopIntegration;
 
-    private Integer state;
+    private FlinkAppStateEnum state;
     /**
      * task release status
      */
     @TableField("`release`")
-    private Integer release;
+    private ReleaseStateEnum release;
 
     /**
      * determine if a task needs to be built
@@ -161,7 +165,7 @@ public class FlinkApplication extends BaseEntity {
      */
     private Integer restartCount;
 
-    private Integer optionState;
+    private OptionStateEnum optionState;
 
     /**
      * alert id
@@ -180,14 +184,14 @@ public class FlinkApplication extends BaseEntity {
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String hotParams;
 
-    private Integer resolveOrder;
+    private ResolveOrder resolveOrder;
 
-    private Integer deployMode;
+    private FlinkDeployMode deployMode;
 
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String dynamicProperties;
 
-    private Integer appType;
+    private ApplicationType appType;
 
     /**
      * determine if tracking status
@@ -263,7 +267,7 @@ public class FlinkApplication extends BaseEntity {
     /**
      * 1: build (build from csv) 2: upload (upload local jar job)
      */
-    private Integer resourceFrom;
+    private ResourceFromEnum resourceFrom;
 
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String tags;
@@ -288,14 +292,14 @@ public class FlinkApplication extends BaseEntity {
     private transient Long configId;
     private transient String flinkVersion;
     private transient String confPath;
-    private transient Integer format;
+    private transient ConfigFileTypeEnum format;
     private transient String savepointPath;
     private transient Boolean restoreOrTriggerSavepoint = false;
     private transient Boolean drain = false;
     private transient Long savepointTimeout = 60L;
     private transient Boolean allowNonRestored = false;
     private transient Boolean nativeFormat = false;
-    private transient Integer restoreMode;
+    private transient FlinkRestoreMode restoreMode;
     private transient String socketId;
     private transient String projectName;
     private transient String createTimeFrom;
@@ -324,14 +328,14 @@ public class FlinkApplication extends BaseEntity {
         return K8sPodTemplates.of(k8sPodTemplate, k8sJmPodTemplate, k8sTmPodTemplate);
     }
 
-    public void setState(Integer state) {
+    public void setState(FlinkAppStateEnum state) {
         this.state = state;
         this.tracking = shouldTracking() ? 1 : 0;
     }
 
     public void setYarnQueueByHotParams() {
-        if (!(FlinkDeployMode.YARN_APPLICATION == this.getDeployModeEnum()
-            || FlinkDeployMode.YARN_PER_JOB == this.getDeployModeEnum())) {
+        if (!(FlinkDeployMode.YARN_APPLICATION.equals(this.deployMode)
+            || FlinkDeployMode.YARN_PER_JOB.equals(this.deployMode))) {
             return;
         }
 
@@ -352,7 +356,7 @@ public class FlinkApplication extends BaseEntity {
      * @return 1: need to be tracked | 0: no need to be tracked.
      */
     public Boolean shouldTracking() {
-        switch (getStateEnum()) {
+        switch (this.state) {
             case ADDED:
             case CREATED:
             case FINISHED:
@@ -372,7 +376,7 @@ public class FlinkApplication extends BaseEntity {
      * @return true: can start | false: can not start.
      */
     public boolean isCanBeStart() {
-        switch (getStateEnum()) {
+        switch (this.state) {
             case ADDED:
             case CREATED:
             case FAILED:
@@ -387,31 +391,6 @@ public class FlinkApplication extends BaseEntity {
             default:
                 return false;
         }
-    }
-
-    @JsonIgnore
-    public ReleaseStateEnum getReleaseState() {
-        return ReleaseStateEnum.of(release);
-    }
-
-    @JsonIgnore
-    public FlinkJobType getJobTypeEnum() {
-        return FlinkJobType.of(jobType);
-    }
-
-    @JsonIgnore
-    public FlinkAppStateEnum getStateEnum() {
-        return FlinkAppStateEnum.getState(state);
-    }
-
-    @JsonIgnore
-    public FlinkK8sRestExposedType getK8sRestExposedTypeEnum() {
-        return FlinkK8sRestExposedType.of(this.k8sRestExposedType);
-    }
-
-    @JsonIgnore
-    public FlinkDeployMode getDeployModeEnum() {
-        return FlinkDeployMode.of(deployMode);
     }
 
     public boolean cpFailedTrigger() {
@@ -449,7 +428,7 @@ public class FlinkApplication extends BaseEntity {
      */
     @JsonIgnore
     public String getAppHome() {
-        switch (this.getDeployModeEnum()) {
+        switch (this.getDeployMode()) {
             case KUBERNETES_NATIVE_APPLICATION:
             case KUBERNETES_NATIVE_SESSION:
             case YARN_PER_JOB:
@@ -461,13 +440,12 @@ public class FlinkApplication extends BaseEntity {
                 return getRemoteAppHome();
             default:
                 throw new UnsupportedOperationException(
-                    "unsupported deployMode ".concat(getDeployModeEnum().getName()));
+                    "unsupported deployMode ".concat(getDeployMode().getName()));
         }
     }
 
     public String getMainClass() {
-        FlinkJobType flinkJobType = this.getJobTypeEnum();
-        switch (flinkJobType) {
+        switch (this.jobType) {
             case FLINK_SQL:
                 return Constants.STREAMPARK_FLINKSQL_CLIENT_CLASS;
             case PYFLINK:
@@ -483,11 +461,6 @@ public class FlinkApplication extends BaseEntity {
     @JsonIgnore
     public String getAppLib() {
         return getAppHome().concat("/lib");
-    }
-
-    @JsonIgnore
-    public ApplicationType getApplicationType() {
-        return ApplicationType.of(appType);
     }
 
     @JsonIgnore
@@ -509,29 +482,29 @@ public class FlinkApplication extends BaseEntity {
 
     @JsonIgnore
     public boolean isFlinkJar() {
-        return FlinkJobType.FLINK_JAR.getMode().equals(this.getJobType());
+        return FlinkJobType.FLINK_JAR.equals(this.jobType);
     }
 
     @JsonIgnore
     public boolean isFlinkJarOrPyFlink() {
-        return FlinkJobType.FLINK_JAR.getMode().equals(this.getJobType())
-            || FlinkJobType.PYFLINK.getMode().equals(this.getJobType());
+        return FlinkJobType.FLINK_JAR.equals(this.jobType)
+            || FlinkJobType.PYFLINK.equals(this.jobType);
     }
 
     @JsonIgnore
     public boolean isUploadResource() {
         return isFlinkJarOrPyFlink()
-            && ResourceFromEnum.UPLOAD.getValue().equals(this.getResourceFrom());
+            && ResourceFromEnum.UPLOAD.equals(this.getResourceFrom());
     }
 
     @JsonIgnore
     public boolean isBuildResource() {
         return isFlinkJarOrPyFlink()
-            && ResourceFromEnum.BUILD.getValue().equals(this.getResourceFrom());
+            && ResourceFromEnum.BUILD.equals(this.getResourceFrom());
     }
 
     public boolean isStreamParkType() {
-        return this.getAppType() == ApplicationType.STREAMPARK_FLINK.getType();
+        return ApplicationType.STREAMPARK_FLINK.equals(this.appType);
     }
 
     @JsonIgnore
@@ -547,12 +520,12 @@ public class FlinkApplication extends BaseEntity {
 
     @JsonIgnore
     public boolean isRunning() {
-        return FlinkAppStateEnum.RUNNING.getValue() == this.getState();
+        return FlinkAppStateEnum.RUNNING == this.getState();
     }
 
     @JsonIgnore
     public boolean isNeedRollback() {
-        return ReleaseStateEnum.NEED_ROLLBACK.get() == this.getRelease();
+        return ReleaseStateEnum.NEED_ROLLBACK.equals(this.release);
     }
 
     @JsonIgnore
@@ -568,9 +541,8 @@ public class FlinkApplication extends BaseEntity {
         return getStorageType(getDeployMode());
     }
 
-    public static StorageType getStorageType(Integer deployMode) {
-        FlinkDeployMode deployModeEnum = FlinkDeployMode.of(deployMode);
-        switch (Objects.requireNonNull(deployModeEnum)) {
+    public static StorageType getStorageType(FlinkDeployMode deployMode) {
+        switch (Objects.requireNonNull(deployMode)) {
             case YARN_APPLICATION:
                 return StorageType.HDFS;
             case YARN_PER_JOB:
@@ -580,7 +552,7 @@ public class FlinkApplication extends BaseEntity {
             case REMOTE:
                 return StorageType.LFS;
             default:
-                throw new UnsupportedOperationException("Unsupported ".concat(deployModeEnum.getName()));
+                throw new UnsupportedOperationException("Unsupported ".concat(deployMode.getName()));
         }
     }
 
@@ -616,12 +588,12 @@ public class FlinkApplication extends BaseEntity {
         if (appParam != this) {
             this.hotParams = null;
         }
-        FlinkDeployMode deployModeEnum = appParam.getDeployModeEnum();
+        FlinkDeployMode deployMode = appParam.getDeployMode();
         Map<String, String> hotParams = new HashMap<>(0);
-        if (needFillYarnQueueLabel(deployModeEnum)) {
+        if (needFillYarnQueueLabel(deployMode)) {
             hotParams.putAll(YarnQueueLabelExpression.getQueueLabelMap(appParam.getYarnQueue()));
         }
-        if (deployModeEnum == FlinkDeployMode.KUBERNETES_NATIVE_APPLICATION) {
+        if (deployMode == FlinkDeployMode.KUBERNETES_NATIVE_APPLICATION) {
             if (StringUtils.isNotBlank(appParam.getServiceAccount())) {
                 hotParams.put(ConfigKeys.KEY_KERBEROS_SERVICE_ACCOUNT(), appParam.getServiceAccount());
             }
@@ -632,7 +604,7 @@ public class FlinkApplication extends BaseEntity {
     }
 
     private boolean needFillYarnQueueLabel(FlinkDeployMode mode) {
-        return FlinkDeployMode.YARN_PER_JOB == mode || FlinkDeployMode.YARN_APPLICATION == mode;
+        return FlinkDeployMode.YARN_PER_JOB.equals(mode) || FlinkDeployMode.YARN_APPLICATION.equals(mode);
     }
 
     @Override
@@ -652,7 +624,6 @@ public class FlinkApplication extends BaseEntity {
     }
 
     public boolean isKubernetesModeJob() {
-        return FlinkDeployMode.isKubernetesMode(this.getDeployModeEnum());
+        return FlinkDeployMode.isKubernetesMode(this.deployMode);
     }
-
 }

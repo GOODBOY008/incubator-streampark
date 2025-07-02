@@ -119,7 +119,7 @@ public class FlinkK8sWatcherWrapper {
         }
         // filter out the application that should be tracking
         return k8sApplication.stream()
-            .filter(app -> !FlinkJobState.isEndState(toK8sFlinkJobState(app.getStateEnum())))
+            .filter(app -> !FlinkJobState.isEndState(toK8sFlinkJobState(app.getState())))
             .map(this::toTrackId)
             .collect(Collectors.toList());
     }

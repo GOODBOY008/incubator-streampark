@@ -20,6 +20,7 @@ package org.apache.streampark.console.core.entity;
 import org.apache.streampark.console.base.mybatis.entity.BaseEntity;
 import org.apache.streampark.console.base.util.JacksonUtils;
 import org.apache.streampark.console.core.bean.AlertConfigParams;
+import org.apache.streampark.console.core.enums.AlertTypeEnum;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -47,7 +48,7 @@ public class AlertConfig extends BaseEntity {
     private String alertName;
 
     /** alert type */
-    private Integer alertType;
+    private AlertTypeEnum alertType;
 
     /** email alert parameters */
     private String emailParams;
@@ -72,11 +73,13 @@ public class AlertConfig extends BaseEntity {
         BeanUtils.copyProperties(
             params,
             alertConfig,
+            "alertType",
             "emailParams",
             "dingTalkParams",
             "weComParams",
             "httpCallbackParams",
             "larkParams");
+        alertConfig.setAlertType(AlertTypeEnum.getByCode(params.getAlertType()));
         try {
             if (params.getEmailParams() != null) {
                 alertConfig.setEmailParams(JacksonUtils.write(params.getEmailParams()));

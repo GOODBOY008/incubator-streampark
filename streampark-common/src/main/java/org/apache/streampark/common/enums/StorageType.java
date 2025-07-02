@@ -19,6 +19,9 @@ package org.apache.streampark.common.enums;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -31,6 +34,8 @@ public enum StorageType {
     /** local File system */
     LFS("lfs");
 
+    @EnumValue
+    @JsonValue
     private final String type;
 
     StorageType(@Nonnull String type) {

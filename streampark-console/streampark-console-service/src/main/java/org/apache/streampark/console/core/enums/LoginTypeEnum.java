@@ -18,6 +18,7 @@
 package org.apache.streampark.console.core.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -37,6 +38,7 @@ public enum LoginTypeEnum {
     SSO(2);
 
     @EnumValue
+    @JsonValue
     private final int code;
 
     LoginTypeEnum(int code) {

@@ -64,7 +64,7 @@ public class FlinkApplicationBackup {
     }
 
     private void renderPath(FlinkApplication application) {
-        switch (application.getDeployModeEnum()) {
+        switch (application.getDeployMode()) {
             case KUBERNETES_NATIVE_APPLICATION:
             case KUBERNETES_NATIVE_SESSION:
             case YARN_PER_JOB:
@@ -82,7 +82,7 @@ public class FlinkApplicationBackup {
                 break;
             default:
                 throw new UnsupportedOperationException(
-                    "unsupported deployMode ".concat(application.getDeployModeEnum().getName()));
+                    "unsupported deployMode ".concat(application.getDeployMode().getName()));
         }
     }
 }

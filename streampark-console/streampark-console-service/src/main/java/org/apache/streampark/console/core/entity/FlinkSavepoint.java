@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.entity;
 
+import org.apache.streampark.console.core.enums.CheckPointTypeEnum;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -45,7 +47,7 @@ public class FlinkSavepoint {
      * 1) checkPoint <br>
      * 2) savepoint
      */
-    private Integer type;
+    private CheckPointTypeEnum type;
 
     private String path;
 

@@ -61,7 +61,7 @@ public class FlinkEffectiveServiceImpl extends ServiceImpl<FlinkEffectiveMapper,
         if (count == 0) {
             FlinkEffective effective = new FlinkEffective();
             effective.setAppId(appId);
-            effective.setTargetType(type.getType());
+            effective.setTargetType(type);
             effective.setTargetId(id);
             effective.setCreateTime(new Date());
             save(effective);

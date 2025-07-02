@@ -17,6 +17,7 @@
 
 package org.apache.streampark.flink.packer.pipeline;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -41,6 +42,8 @@ public enum PipelineStepStatusEnum {
 
     unknown(0), waiting(1), running(2), success(3), failure(4), skipped(5);
 
+    @EnumValue
+    @JsonValue
     private final Integer code;
 
     PipelineStepStatusEnum(Integer code) {

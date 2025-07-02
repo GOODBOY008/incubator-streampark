@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Arrays;
 
 /** Release Status */
@@ -45,6 +48,8 @@ public enum ReleaseStateEnum {
     /** revoked */
     REVOKED(10);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     ReleaseStateEnum(int value) {

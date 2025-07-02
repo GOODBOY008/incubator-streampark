@@ -190,7 +190,7 @@ public class FlinkCheckpointProcessor {
         savepoint.setAppId(appId);
         savepoint.setChkId(checkPoint.getId());
         savepoint.setLatest(true);
-        savepoint.setType(checkPoint.getCheckPointType().get());
+        savepoint.setType(checkPoint.getCheckPointType());
         savepoint.setPath(checkPoint.getExternalPath());
         savepoint.setTriggerTime(new Date(checkPoint.getTriggerTimestamp()));
         savepoint.setCreateTime(new Date());

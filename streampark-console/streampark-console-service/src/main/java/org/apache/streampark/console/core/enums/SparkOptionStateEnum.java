@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -34,6 +36,8 @@ public enum SparkOptionStateEnum {
     /** Application which is currently action: stopping. */
     STOPPING(3);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     SparkOptionStateEnum(int value) {

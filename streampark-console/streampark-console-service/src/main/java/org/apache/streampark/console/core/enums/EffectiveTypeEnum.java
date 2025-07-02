@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -31,6 +33,8 @@ public enum EffectiveTypeEnum {
     /** SPARKSQL */
     SPARKSQL(4);
 
+    @EnumValue
+    @JsonValue
     private final int type;
 
     EffectiveTypeEnum(int value) {

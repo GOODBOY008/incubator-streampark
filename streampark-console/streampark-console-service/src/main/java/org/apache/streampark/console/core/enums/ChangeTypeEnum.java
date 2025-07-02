@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -40,6 +42,8 @@ public enum ChangeTypeEnum {
     /** Represents a change in team resources. */
     TEAM_RESOURCE(4, "[TEAM_RESOURCE], Team resource has changed");
 
+    @EnumValue
+    @JsonValue
     private final int value;
     private final String description;
 

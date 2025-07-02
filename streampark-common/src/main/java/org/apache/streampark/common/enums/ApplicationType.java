@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nonnull;
 
 /** Application type enum. */
@@ -37,6 +40,8 @@ public enum ApplicationType {
     /** Apache Spark */
     APACHE_SPARK(4, "Apache Spark");
 
+    @EnumValue
+    @JsonValue
     private final int type;
     private final String name;
 

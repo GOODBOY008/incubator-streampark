@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -43,6 +46,8 @@ public enum SparkDeployMode {
 
     KUBERNETES_NATIVE_CLIENT(5, "kubernetes-native-client");
 
+    @EnumValue
+    @JsonValue
     private final Integer mode;
 
     private final String name;

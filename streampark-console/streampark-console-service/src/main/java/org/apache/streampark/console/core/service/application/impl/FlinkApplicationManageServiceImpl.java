@@ -149,7 +149,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
 
     @PostConstruct
     public void resetOptionState() {
-        this.lambdaUpdate().set(FlinkApplication::getOptionState, OptionStateEnum.NONE.getValue()).update();
+        this.lambdaUpdate().set(FlinkApplication::getOptionState, OptionStateEnum.NONE).update();
     }
 
     @Override
@@ -181,7 +181,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
             .set(appParam.getClusterId() != null, FlinkApplication::getClusterId, appParam.getClusterId())
             .set(appParam.getJobId() != null, FlinkApplication::getJobId, appParam.getJobId())
             .set(FlinkApplication::getEndTime, null)
-            .set(FlinkApplication::getState, FlinkAppStateEnum.MAPPING.getValue())
+            .set(FlinkApplication::getState, FlinkAppStateEnum.MAPPING)
             .set(FlinkApplication::getTracking, 1)
             .update();
 
@@ -330,9 +330,9 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
         ApiAlertException.throwIfNull(
             appParam.getTeamId(), "The teamId can't be null. Create application failed.");
         appParam.setUserId(ServiceHelper.getUserId());
-        appParam.setState(FlinkAppStateEnum.ADDED.getValue());
-        appParam.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
-        appParam.setOptionState(OptionStateEnum.NONE.getValue());
+        appParam.setState(FlinkAppStateEnum.ADDED);
+        appParam.setRelease(ReleaseStateEnum.NEED_RELEASE);
+        appParam.setOptionState(OptionStateEnum.NONE);
         Date date = new Date();
         appParam.setCreateTime(date);
         appParam.setModifyTime(date);
@@ -359,7 +359,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
 
         boolean saveSuccess = save(appParam);
         if (saveSuccess) {
-            FlinkJobType jobType = appParam.getJobTypeEnum();
+            FlinkJobType jobType = appParam.getJobType();
             if (jobType == FlinkJobType.FLINK_SQL || jobType == FlinkJobType.PYFLINK) {
                 FlinkSql flinkSql = new FlinkSql(appParam);
                 flinkSqlService.create(flinkSql);
@@ -392,7 +392,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
 
         newApp.setJobName(jobName);
         newApp.setClusterId(
-            FlinkDeployMode.isSessionMode(persist.getDeployModeEnum())
+            FlinkDeployMode.isSessionMode(persist.getDeployMode())
                 ? persist.getClusterId()
                 : null);
         newApp.setArgs(appParam.getArgs() != null ? appParam.getArgs() : persist.getArgs());
@@ -423,9 +423,9 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
         newApp.setProjectId(persist.getProjectId());
         newApp.setModule(persist.getModule());
         newApp.setUserId(ServiceHelper.getUserId());
-        newApp.setState(FlinkAppStateEnum.ADDED.getValue());
-        newApp.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
-        newApp.setOptionState(OptionStateEnum.NONE.getValue());
+        newApp.setState(FlinkAppStateEnum.ADDED);
+        newApp.setRelease(ReleaseStateEnum.NEED_RELEASE);
+        newApp.setOptionState(OptionStateEnum.NONE);
         newApp.setHotParams(persist.getHotParams());
 
         // createTime & modifyTime
@@ -471,7 +471,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
         FlinkApplication application = getById(appParam.getId());
 
         /* If the original mode is remote, k8s-session, yarn-session, check cluster status */
-        FlinkDeployMode flinkDeployMode = application.getDeployModeEnum();
+        FlinkDeployMode flinkDeployMode = application.getDeployMode();
         switch (flinkDeployMode) {
             case REMOTE:
             case YARN_SESSION:
@@ -489,7 +489,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
             success,
             String.format(ERROR_APP_QUEUE_HINT, appParam.getYarnQueue(), appParam.getTeamId()));
 
-        application.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
+        application.setRelease(ReleaseStateEnum.NEED_RELEASE);
 
         // 1) jar job jar file changed
         if (application.isUploadResource()) {
@@ -556,7 +556,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
         application.setCpMaxFailureInterval(appParam.getCpMaxFailureInterval());
         application.setTags(appParam.getTags());
 
-        switch (appParam.getDeployModeEnum()) {
+        switch (appParam.getDeployMode()) {
             case YARN_APPLICATION:
                 application.setHadoopUser(appParam.getHadoopUser());
                 break;
@@ -653,7 +653,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
                     // sql and dependency not changed, but version changed, means that rollback to the version
                     CandidateTypeEnum type = CandidateTypeEnum.HISTORY;
                     flinkSqlService.setCandidate(type, appParam.getId(), appParam.getSqlId());
-                    application.setRelease(ReleaseStateEnum.NEED_ROLLBACK.get());
+                    application.setRelease(ReleaseStateEnum.NEED_ROLLBACK);
                     application.setBuild(true);
                 }
             }
@@ -704,11 +704,11 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
             LambdaUpdateChainWrapper<FlinkApplication> update = this.lambdaUpdate()
                 .eq(FlinkApplication::getId, appParam.getId());
             if (appParam.isRunning()) {
-                update.set(FlinkApplication::getRelease, ReleaseStateEnum.NEED_RESTART.get());
+                update.set(FlinkApplication::getRelease, ReleaseStateEnum.NEED_RESTART);
             } else {
                 update
-                    .set(FlinkApplication::getRelease, ReleaseStateEnum.DONE.get())
-                    .set(FlinkApplication::getOptionState, OptionStateEnum.NONE.getValue());
+                    .set(FlinkApplication::getRelease, ReleaseStateEnum.DONE)
+                    .set(FlinkApplication::getOptionState, OptionStateEnum.NONE);
             }
 
             update.update();
@@ -733,7 +733,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
 
     @Override
     public void clean(FlinkApplication appParam) {
-        appParam.setRelease(ReleaseStateEnum.DONE.get());
+        appParam.setRelease(ReleaseStateEnum.DONE);
         this.updateRelease(appParam);
     }
 
@@ -781,7 +781,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
      */
     @VisibleForTesting
     public boolean validateQueueIfNeeded(FlinkApplication appParam) {
-        yarnQueueService.checkQueueLabel(appParam.getDeployModeEnum(), appParam.getYarnQueue());
+        yarnQueueService.checkQueueLabel(appParam.getDeployMode(), appParam.getYarnQueue());
         if (!isYarnNotDefaultQueue(appParam)) {
             return true;
         }
@@ -797,13 +797,13 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
      */
     @VisibleForTesting
     public boolean validateQueueIfNeeded(FlinkApplication oldApp, FlinkApplication newApp) {
-        yarnQueueService.checkQueueLabel(newApp.getDeployModeEnum(), newApp.getYarnQueue());
+        yarnQueueService.checkQueueLabel(newApp.getDeployMode(), newApp.getYarnQueue());
         if (!isYarnNotDefaultQueue(newApp)) {
             return true;
         }
 
         oldApp.setYarnQueueByHotParams();
-        if (FlinkDeployMode.isYarnPerJobOrAppMode(newApp.getDeployModeEnum())
+        if (FlinkDeployMode.isYarnPerJobOrAppMode(newApp.getDeployMode())
             && StringUtils.equals(oldApp.getYarnQueue(), newApp.getYarnQueue())) {
             return true;
         }
@@ -819,7 +819,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
      * (empty or default), return true, false else.
      */
     private boolean isYarnNotDefaultQueue(FlinkApplication application) {
-        return FlinkDeployMode.isYarnPerJobOrAppMode(application.getDeployModeEnum())
+        return FlinkDeployMode.isYarnPerJobOrAppMode(application.getDeployMode())
             && !yarnQueueService.isDefaultQueue(application.getYarnQueue());
     }
 
@@ -844,7 +844,7 @@ public class FlinkApplicationManageServiceImpl extends ServiceImpl<FlinkApplicat
 
     private boolean isYarnApplicationModeChange(FlinkApplication application, FlinkApplication appParam) {
         return !application.getDeployMode().equals(appParam.getDeployMode())
-            && (FlinkDeployMode.YARN_APPLICATION == appParam.getDeployModeEnum()
-                || FlinkDeployMode.YARN_APPLICATION == application.getDeployModeEnum());
+            && (FlinkDeployMode.YARN_APPLICATION == appParam.getDeployMode()
+                || FlinkDeployMode.YARN_APPLICATION == application.getDeployMode());
     }
 }

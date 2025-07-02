@@ -72,12 +72,12 @@ public class FlinkApplicationConfigServiceImpl
         applicationConfig.setAppId(appParam.getId());
 
         if (appParam.getFormat() != null) {
-            ConfigFileTypeEnum fileType = ConfigFileTypeEnum.of(appParam.getFormat());
+            ConfigFileTypeEnum fileType = appParam.getFormat();
             ApiAlertException.throwIfTrue(
-                fileType == null || ConfigFileTypeEnum.UNKNOWN == fileType,
+                ConfigFileTypeEnum.UNKNOWN == fileType,
                 "application' config error. must be (.properties|.yaml|.yml |.conf)");
 
-            applicationConfig.setFormat(fileType.getValue());
+            applicationConfig.setFormat(fileType);
         }
 
         applicationConfig.setContent(config);

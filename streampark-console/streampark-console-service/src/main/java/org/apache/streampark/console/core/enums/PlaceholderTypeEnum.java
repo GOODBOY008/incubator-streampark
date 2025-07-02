@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /** configFile Type enum */
 public enum PlaceholderTypeEnum {
 
@@ -28,6 +31,8 @@ public enum PlaceholderTypeEnum {
 
     YARN_ID("yarn_id");
 
+    @EnumValue
+    @JsonValue
     private final String name;
 
     PlaceholderTypeEnum(String name) {

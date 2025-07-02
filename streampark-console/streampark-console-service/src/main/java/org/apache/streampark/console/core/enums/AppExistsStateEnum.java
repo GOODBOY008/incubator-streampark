@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /** Application status, whether it exists, and where it exists */
 public enum AppExistsStateEnum {
 
@@ -35,6 +38,8 @@ public enum AppExistsStateEnum {
     /** job name invalid because of special utf-8 character */
     INVALID(4);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     AppExistsStateEnum(int value) {

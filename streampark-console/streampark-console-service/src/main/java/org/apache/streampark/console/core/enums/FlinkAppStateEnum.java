@@ -19,6 +19,8 @@ package org.apache.streampark.console.core.enums;
 
 import org.apache.streampark.flink.kubernetes.enums.FlinkJobState;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import scala.Enumeration;
@@ -103,6 +105,8 @@ public enum FlinkAppStateEnum {
     /** Has killed in Yarn. */
     KILLED(-9);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     FlinkAppStateEnum(int value) {

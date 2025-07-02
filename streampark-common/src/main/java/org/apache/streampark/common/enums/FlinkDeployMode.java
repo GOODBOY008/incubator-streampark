@@ -17,6 +17,8 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nonnull;
@@ -50,6 +52,8 @@ public enum FlinkDeployMode {
 
     /** kubernetes application */
     KUBERNETES_NATIVE_APPLICATION(6, "kubernetes-application");
+    @EnumValue
+    @JsonValue
     private final Integer mode;
 
     private final String name;
@@ -147,8 +151,8 @@ public enum FlinkDeployMode {
      * @param value The mode value of potential flink execution mode.
      * @return The judged result.
      */
-    public static boolean isKubernetesSessionMode(@Nullable Integer value) {
-        return KUBERNETES_NATIVE_SESSION == of(value);
+    public static boolean isKubernetesSessionMode(@Nullable FlinkDeployMode value) {
+        return KUBERNETES_NATIVE_SESSION == value;
     }
 
     /**
@@ -177,8 +181,8 @@ public enum FlinkDeployMode {
      * @param value The mode value of potential flink execution mode.
      * @return The judged result.
      */
-    public static boolean isKubernetesApplicationMode(@Nullable Integer value) {
-        return KUBERNETES_NATIVE_APPLICATION == of(value);
+    public static boolean isKubernetesApplicationMode(@Nullable FlinkDeployMode value) {
+        return KUBERNETES_NATIVE_APPLICATION == value;
     }
 
     /** Get all k8s mode values into a list. */

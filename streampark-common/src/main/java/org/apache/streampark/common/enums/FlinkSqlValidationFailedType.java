@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nullable;
 
 /** Flink SQL validation failed type enum. */
@@ -37,6 +40,8 @@ public enum FlinkSqlValidationFailedType {
     /** Not at the end of ";" */
     ENDS_WITH(5);
 
+    @EnumValue
+    @JsonValue
     private final int failedType;
 
     FlinkSqlValidationFailedType(int failedType) {

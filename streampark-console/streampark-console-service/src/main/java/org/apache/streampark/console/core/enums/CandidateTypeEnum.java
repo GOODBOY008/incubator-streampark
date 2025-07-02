@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Arrays;
 
 public enum CandidateTypeEnum {
@@ -30,6 +33,8 @@ public enum CandidateTypeEnum {
     /** specific history becomes a candidate */
     HISTORY(2);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     CandidateTypeEnum(int value) {

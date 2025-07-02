@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -29,7 +32,8 @@ public enum FlinkRestoreMode {
      * In this mode Flink claims ownership of the snapshot and essentially treats it like a
      * checkpoint: its controls the lifecycle and might delete it if it is not needed for recovery
      * anymore. Hence, it is not safe to manually delete the snapshot or to start two jobs from the
-     * same snapshot. Flink keeps around a configured number of checkpoints.
+     * same snapshot.
+     * Flink keeps around a configured number of checkpoints.
      */
     CLAIM(1),
 
@@ -49,6 +53,8 @@ public enum FlinkRestoreMode {
     public static final String RESTORE_MODE = "execution.savepoint-restore-mode";
     public static final int SINCE_FLINK_VERSION = 15;
 
+    @EnumValue
+    @JsonValue
     private final int mode;
 
     public int get() {

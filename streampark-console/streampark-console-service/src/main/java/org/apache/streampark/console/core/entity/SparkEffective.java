@@ -42,7 +42,7 @@ public class SparkEffective {
      * 1) config <br>
      * 2) spark Sql<br>
      */
-    private Integer targetType;
+    private EffectiveTypeEnum targetType;
 
     private Long targetId;
     private Date createTime;

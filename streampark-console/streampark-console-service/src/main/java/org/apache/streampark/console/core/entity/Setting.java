@@ -44,6 +44,11 @@ public class Setting implements Serializable {
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String settingValue;
 
+    /**
+     * Type of setting.
+     * Remains Integer: analysis found no enum mapping or consistent semantics.
+     * Used as a generic or extensible integer type.
+     */
     private Integer type;
 
     private String description;

@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * The DistributedTaskEnum represents the possible actions that can be performed on a task.
  */
@@ -52,6 +55,8 @@ public enum DistributedTaskEnum {
      */
     FORCED_STOP(5);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     DistributedTaskEnum(int value) {

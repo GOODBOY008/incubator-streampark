@@ -33,6 +33,23 @@ class SettingServiceTest extends SpringUnitTestBase {
     @Autowired
     SettingService settingService;
 
+    /**
+     * Documentation/assertion test for Setting.type remaining as Integer.
+     * Rationale: analysis found no enum mapping or consistent semantics; used as a generic or extensible integer type.
+     * This test asserts that the type field is Integer and not an enum.
+     */
+    @Test
+    void testSettingTypeIsInteger() {
+        // The Setting entity's 'type' field is intentionally kept as Integer for flexibility.
+        // This assertion documents and verifies that the field is not mapped to an enum.
+        try {
+            java.lang.reflect.Field typeField =
+                org.apache.streampark.console.core.entity.Setting.class.getDeclaredField("type");
+            Assertions.assertEquals(Integer.class, typeField.getType(), "Setting.type should be Integer, not an enum.");
+        } catch (NoSuchFieldException e) {
+            Assertions.fail("Setting entity should have a 'type' field.");
+        }
+    }
     @Test
     void testUpdateDockerConfigTest() {
         DockerConfig dockerConfig = new DockerConfig();

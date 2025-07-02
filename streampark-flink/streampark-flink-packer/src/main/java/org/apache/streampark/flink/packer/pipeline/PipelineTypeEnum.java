@@ -17,6 +17,7 @@
 
 package org.apache.streampark.flink.packer.pipeline;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableMap;
@@ -105,6 +106,8 @@ public enum PipelineTypeEnum {
             .build(),
         DockerImageBuildResponse.class);
 
+    @EnumValue
+    @JsonValue
     private final Integer code;
     /** short description of pipeline type. */
     private final String desc;

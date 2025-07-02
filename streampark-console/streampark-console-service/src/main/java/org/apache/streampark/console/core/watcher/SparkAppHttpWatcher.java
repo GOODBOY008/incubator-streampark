@@ -168,7 +168,7 @@ public class SparkAppHttpWatcher {
     @VisibleForTesting
     public @Nullable SparkAppStateEnum tryQuerySparkAppState(@Nonnull Long appId) {
         SparkApplication app = WATCHING_APPS.get(appId);
-        return (app == null || app.getState() == null) ? null : app.getStateEnum();
+        return (app == null || app.getState() == null) ? null : app.getState();
     }
 
     private void watch(Long id, SparkApplication application) {
@@ -207,7 +207,7 @@ public class SparkAppHttpWatcher {
                 if (SparkAppStateEnum.OTHER == sparkAppStateEnum) {
                     return;
                 }
-                if (SparkAppStateEnum.isEndState(sparkAppStateEnum.getValue())) {
+                if (SparkAppStateEnum.isEndState(sparkAppStateEnum)) {
                     log.info(
                         "[StreamPark][SparkAppHttpWatcher] getStateFromYarn, app {} was ended, appId is {}, state is {}",
                         application.getId(),
@@ -236,7 +236,7 @@ public class SparkAppHttpWatcher {
                             "[StreamPark][SparkAppHttpWatcher] getStateFromYarn, fetch spark job status failed. The job may have already been finished.");
                     }
                 }
-                application.setState(sparkAppStateEnum.getValue());
+                application.setState(sparkAppStateEnum);
                 cleanOptioning(optionStateEnum, application.getId());
                 doPersistMetrics(application, false);
                 if (SparkAppStateEnum.FAILED == sparkAppStateEnum

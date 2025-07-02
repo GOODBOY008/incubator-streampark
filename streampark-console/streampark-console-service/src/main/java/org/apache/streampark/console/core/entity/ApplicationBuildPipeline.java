@@ -70,10 +70,10 @@ public class ApplicationBuildPipeline {
     private Long appId;
 
     @TableField(value = "pipe_type")
-    private Integer pipeTypeCode;
+    private PipelineTypeEnum pipeType;
 
     @TableField(value = "pipe_status")
-    private Integer pipeStatusCode;
+    private PipelineStatusEnum pipeStatus;
 
     private Integer curStep;
 
@@ -94,30 +94,6 @@ public class ApplicationBuildPipeline {
     private String buildResultJson;
 
     private Date modifyTime;
-
-    @Nonnull
-    @JsonIgnore
-    public PipelineTypeEnum getPipeType() {
-        return PipelineTypeEnum.of(pipeTypeCode);
-    }
-
-    @JsonIgnore
-    public ApplicationBuildPipeline setPipeType(@Nonnull PipelineTypeEnum pipeType) {
-        this.pipeTypeCode = pipeType.getCode();
-        return this;
-    }
-
-    @Nonnull
-    @JsonIgnore
-    public PipelineStatusEnum getPipelineStatus() {
-        return PipelineStatusEnum.of(pipeStatusCode);
-    }
-
-    @JsonIgnore
-    public ApplicationBuildPipeline setPipeStatus(@Nonnull PipelineStatusEnum pipeStatus) {
-        this.pipeStatusCode = pipeStatus.getCode();
-        return this;
-    }
 
     @Nonnull
     @JsonIgnore
@@ -314,8 +290,8 @@ public class ApplicationBuildPipeline {
 
             return new View()
                 .setAppId(pipe.getAppId())
-                .setPipeType(pipe.getPipeTypeCode())
-                .setPipeStatus(pipe.getPipeStatusCode())
+                .setPipeType(pipe.getPipeType().getCode())
+                .setPipeStatus(pipe.getPipeStatus().getCode())
                 .setCurStep(pipe.getCurStep())
                 .setTotalStep(pipe.getTotalStep())
                 .setPercent(

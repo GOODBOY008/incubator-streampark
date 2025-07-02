@@ -20,9 +20,11 @@ package org.apache.streampark.console.core.entity;
 import org.apache.streampark.common.conf.CommonConfig;
 import org.apache.streampark.common.conf.InternalConfigHolder;
 import org.apache.streampark.common.conf.Workspace;
+import org.apache.streampark.common.enums.ApplicationType;
 import org.apache.streampark.common.util.AssertUtils;
 import org.apache.streampark.common.util.Utils;
 import org.apache.streampark.console.base.util.WebUtils;
+import org.apache.streampark.console.core.enums.BuildStateEnum;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -88,10 +90,13 @@ public class Project implements Serializable {
      * Build status: -2: Changed, need to rebuild -1: Not built 0: Building 1: Build successful 2:
      * Build failed
      */
-    private Integer buildState;
+    private BuildStateEnum buildState;
 
-    /** 1) flink 2) spark */
-    private Integer type;
+    /**
+     * Application type.
+     * Replaced Integer with {@link ApplicationType} enum for type safety.
+     */
+    private ApplicationType type;
 
     private Date createTime;
 

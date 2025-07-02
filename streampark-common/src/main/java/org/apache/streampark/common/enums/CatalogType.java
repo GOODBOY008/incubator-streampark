@@ -17,13 +17,27 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 /** catalog type */
 public enum CatalogType {
-    MYSQL,
-    PGSQL,
-    ORACLE,
-    JDBC,
-    HIVE,
-    PAIMON,
-    CUSTOM
+
+    MYSQL(0),
+    PGSQL(1),
+    ORACLE(2),
+    JDBC(3),
+    HIVE(4),
+    PAIMON(5),
+    CUSTOM(6);
+
+    @EnumValue
+    private final int value;
+
+    CatalogType(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
 }

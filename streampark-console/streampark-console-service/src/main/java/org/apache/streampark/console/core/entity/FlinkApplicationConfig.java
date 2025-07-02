@@ -57,7 +57,7 @@ public class FlinkApplicationConfig {
      * 2)prop <br>
      * 3)hocon
      */
-    private Integer format;
+    private ConfigFileTypeEnum format;
 
     /** default version: 1 */
     private Integer version = 1;
@@ -129,11 +129,10 @@ public class FlinkApplicationConfig {
 
     @Nullable
     private Map<String, String> renderConfigs() {
-        ConfigFileTypeEnum fileType = ConfigFileTypeEnum.of(this.format);
-        if (fileType == null) {
+        if (this.format == null) {
             return null;
         }
-        switch (fileType) {
+        switch (this.format) {
             case YAML:
                 return PropertiesUtils.fromYamlTextAsJava(DeflaterUtils.unzipString(this.content));
             case PROPERTIES:

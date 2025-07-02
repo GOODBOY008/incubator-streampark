@@ -24,6 +24,7 @@ import org.apache.streampark.console.core.service.alert.impl.HttpCallbackAlertNo
 import org.apache.streampark.console.core.service.alert.impl.LarkAlertNotifyServiceImpl;
 import org.apache.streampark.console.core.service.alert.impl.WeComAlertNotifyServiceImpl;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import org.springframework.util.CollectionUtils;
@@ -57,6 +58,7 @@ public enum AlertTypeEnum {
     private static final Integer EMPTY_LEVEL = 0;
 
     /** Get the alert type by the code */
+    @EnumValue
     @JsonValue
     private final Integer code;
 
@@ -105,7 +107,7 @@ public enum AlertTypeEnum {
         return result;
     }
 
-    private static AlertTypeEnum getByCode(Integer code) {
+    public static AlertTypeEnum getByCode(Integer code) {
         return CACHE_MAP.get(code);
     }
 }

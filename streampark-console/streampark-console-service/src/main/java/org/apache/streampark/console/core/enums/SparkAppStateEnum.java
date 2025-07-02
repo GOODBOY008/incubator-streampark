@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /** Describe the status of Spark Application */
@@ -71,6 +73,8 @@ public enum SparkAppStateEnum {
     /** Has killed in Yarn. */
     KILLED(-9);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     SparkAppStateEnum(int value) {
@@ -95,8 +99,7 @@ public enum SparkAppStateEnum {
         return SparkAppStateEnum.OTHER;
     }
 
-    public static boolean isEndState(Integer appState) {
-        SparkAppStateEnum sparkAppStateEnum = SparkAppStateEnum.of(appState);
+    public static boolean isEndState(SparkAppStateEnum sparkAppStateEnum) {
         return SparkAppStateEnum.FAILED == sparkAppStateEnum
             || SparkAppStateEnum.KILLED == sparkAppStateEnum
             || SparkAppStateEnum.FINISHED == sparkAppStateEnum

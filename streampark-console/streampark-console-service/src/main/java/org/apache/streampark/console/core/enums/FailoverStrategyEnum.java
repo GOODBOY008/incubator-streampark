@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Arrays;
 
 /** Provides how to deal with problems when encountering them */
@@ -28,6 +31,8 @@ public enum FailoverStrategyEnum {
     /** restart app */
     RESTART(2);
 
+    @EnumValue
+    @JsonValue
     private final int value;
 
     FailoverStrategyEnum(int value) {

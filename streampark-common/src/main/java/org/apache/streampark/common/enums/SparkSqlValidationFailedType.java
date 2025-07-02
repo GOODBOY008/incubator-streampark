@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nullable;
 
 /** Spark SQL validation failed type enum. */
@@ -40,6 +43,8 @@ public enum SparkSqlValidationFailedType {
     /** Class exception */
     CLASS_ERROR(6);
 
+    @EnumValue
+    @JsonValue
     private final int failedType;
 
     SparkSqlValidationFailedType(int failedType) {

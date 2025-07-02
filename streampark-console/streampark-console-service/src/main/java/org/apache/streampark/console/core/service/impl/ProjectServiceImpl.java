@@ -131,7 +131,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
             project.getTeamId().equals(projectParam.getTeamId()),
             "Team can't be changed, update project failed.");
         ApiAlertException.throwIfFalse(
-            !project.getBuildState().equals(BuildStateEnum.BUILDING.get()),
+            !project.getBuildState().equals(BuildStateEnum.BUILDING),
             "The project is being built, update project failed.");
         project.setName(projectParam.getName());
         project.setUrl(projectParam.getUrl());
@@ -150,14 +150,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
         }
         if (projectParam.getBuildState() != null) {
             project.setBuildState(projectParam.getBuildState());
-            if (BuildStateEnum.of(projectParam.getBuildState()).equals(BuildStateEnum.NEED_REBUILD)) {
+            if (projectParam.getBuildState().equals(BuildStateEnum.NEED_REBUILD)) {
                 List<FlinkApplication> applications = listApps(project);
                 // Update deployment status
                 applications.forEach(
                     (app) -> {
                         log.info(
                             "update deploy by project: {}, appName:{}", project.getName(), app.getJobName());
-                        app.setRelease(ReleaseStateEnum.NEED_CHECK.get());
+                        app.setRelease(ReleaseStateEnum.NEED_CHECK);
                         applicationManageService.updateRelease(app);
                     });
             }
@@ -213,7 +213,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
     public void build(Long id) throws Exception {
 
         Long currentBuildCount = this.lambdaQuery()
-            .eq(Project::getBuildState, BuildStateEnum.BUILDING.get())
+            .eq(Project::getBuildState, BuildStateEnum.BUILDING)
             .count();
 
         ApiAlertException.throwIfTrue(
@@ -245,7 +245,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
                             "update deploy by project: {}, appName:{}",
                             project.getName(),
                             app.getJobName());
-                        app.setRelease(ReleaseStateEnum.NEED_RELEASE.get());
+                        app.setRelease(ReleaseStateEnum.NEED_RELEASE);
                         app.setBuild(true);
                         this.applicationManageService.updateRelease(app);
                     });
@@ -261,7 +261,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
         Project project = getById(id);
         AssertUtils.notNull(project);
 
-        if (BuildStateEnum.SUCCESSFUL != BuildStateEnum.of(project.getBuildState())
+        if (BuildStateEnum.SUCCESSFUL != project.getBuildState()
             || !project.getDistHome().exists()) {
             return Collections.emptyList();
         }
@@ -371,7 +371,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project>
             log.warn(errorMsg);
             return RestResponse.success().data(errorMsg);
         }
-        boolean isBuilding = this.getById(id).getBuildState() == 0;
+        boolean isBuilding = this.getById(id).getBuildState() == BuildStateEnum.BUILDING;
         byte[] fileContent;
         long endOffset = 0L;
         boolean readFinished = true;

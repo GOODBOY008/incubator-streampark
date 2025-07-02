@@ -17,6 +17,9 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Arrays;
 
 public enum AuthenticationType {
@@ -25,6 +28,8 @@ public enum AuthenticationType {
 
     OPENAPI(2);
 
+    @EnumValue
+    @JsonValue
     private final Integer value;
 
     AuthenticationType(int value) {

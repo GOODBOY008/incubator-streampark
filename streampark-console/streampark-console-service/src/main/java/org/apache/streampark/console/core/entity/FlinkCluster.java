@@ -71,7 +71,7 @@ public class FlinkCluster implements Serializable {
 
     private String clusterName;
 
-    private Integer deployMode;
+    private FlinkDeployMode deployMode;
 
     /** flink version */
     private Long versionId;
@@ -94,16 +94,16 @@ public class FlinkCluster implements Serializable {
 
     private String dynamicProperties;
 
-    private Integer k8sRestExposedType;
+    private FlinkK8sRestExposedType k8sRestExposedType;
 
     private String k8sConf;
 
-    private Integer resolveOrder;
+    private ResolveOrder resolveOrder;
 
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String exception;
 
-    private Integer clusterState;
+    private ClusterState clusterState;
 
     private Date createTime;
 
@@ -120,18 +120,8 @@ public class FlinkCluster implements Serializable {
     private transient Integer affectedJobs = 0;
 
     @JsonIgnore
-    public FlinkK8sRestExposedType getK8sRestExposedTypeEnum() {
-        return FlinkK8sRestExposedType.of(this.k8sRestExposedType);
-    }
-
-    @JsonIgnore
-    public FlinkDeployMode getFlinkDeployModeEnum() {
-        return FlinkDeployMode.of(this.deployMode);
-    }
-
-    @JsonIgnore
-    public ClusterState getClusterStateEnum() {
-        return ClusterState.of(this.clusterState);
+    public ClusterState getClusterState() {
+        return clusterState;
     }
 
     @JsonIgnore
@@ -141,7 +131,7 @@ public class FlinkCluster implements Serializable {
             return new HashMap<>();
         }
         Map<String, Object> optionMap = JacksonUtils.read(this.options, Map.class);
-        if (FlinkDeployMode.YARN_SESSION == getFlinkDeployModeEnum()) {
+        if (FlinkDeployMode.YARN_SESSION == getDeployMode()) {
             optionMap.put(ConfigKeys.KEY_YARN_APP_NAME(), this.clusterName);
             optionMap.putAll(YarnQueueLabelExpression.getQueueLabelMap(yarnQueue));
         }
@@ -184,7 +174,7 @@ public class FlinkCluster implements Serializable {
             FlinkConfigurationUtils.extractDynamicPropertiesAsJava(this.getDynamicProperties());
         propertyMap.putAll(this.getOptionMap());
         propertyMap.putAll(dynamicPropertyMap);
-        ResolveOrder resolveOrder = ResolveOrder.of(this.getResolveOrder());
+        ResolveOrder resolveOrder = this.getResolveOrder();
         if (resolveOrder != null) {
             propertyMap.put(CoreOptions.CLASSLOADER_RESOLVE_ORDER.key(), resolveOrder.getName());
         }

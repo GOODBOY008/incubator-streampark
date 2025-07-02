@@ -17,6 +17,8 @@
 
 package org.apache.streampark.console.core.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -33,6 +35,8 @@ public enum ConfigFileTypeEnum {
 
     UNKNOWN(0, null);
 
+    @EnumValue
+    @JsonValue
     private final int value;
     private final String typeName;
 

@@ -17,6 +17,9 @@
 
 package org.apache.streampark.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -54,6 +57,8 @@ public enum ClusterState {
     /** cluster killed */
     KILLED(8);
 
+    @EnumValue
+    @JsonValue
     private final Integer state;
 
     ClusterState(@Nonnull Integer state) {
